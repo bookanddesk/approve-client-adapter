@@ -1,0 +1,25 @@
+
+server:
+  servlet:
+    context-path: /approve-client-adapter
+
+spring:
+  jackson:
+    serialization:
+      FAIL_ON_EMPTY_BEANS: false
+#  mvc:
+#    servlet:
+#      path: /approve-client-adapter
+#  devtools:
+#    livereload:
+#      enabled: false
+
+hx:
+  nc:
+    IP: http://172.20.54.250:8086
+    userid: zxyadmin
+    groupid: 0001A9100000000006H5
+  oa:
+    IP: 127.0.0.1:8081
+
+

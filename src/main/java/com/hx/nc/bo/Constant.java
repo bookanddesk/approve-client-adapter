@@ -1,0 +1,35 @@
+package com.hx.nc.bo;
+
+/**
+ * @author XingJiajun
+ * @Date 2018/12/12 14:59
+ * @Description
+ */
+public class Constant {
+    public static final String UNDERLINE = "_";
+
+//    public static final String one_string_value = "1";
+    public static final String zero_string_value = "0";
+
+    public static final String SERVLET_TASK = "/servlet/ncTaskList";
+    public static final String SERVLET_BILL_DETAIL = "/servlet/ncTaskBill";
+    public static final String SERVLET_APPROVE_DETAIL = "/servlet/ncApproveDetail";
+    public static final String SERVLET_ACTION = "/servlet/ncExeAction";
+    public static final String SERVLET_ATTACH_LIST = "/servlet/ncExeAction";
+
+    public static final String NC_PARAM_USER_ID = "userid";
+    public static final String NC_PARAM_GROUP_ID = "groupid";
+    public static final String NC_PARAM_TASK_ID = "taskId";
+    public static final String NC_PARAM_BILL_ID = "billId";
+    public static final String NC_PARAM_PK_BILL_TYPE = "pk_billtype";
+    public static final String NC_PARAM_BILL_TYPE = "billtype";
+    public static final String NC_PARAM_ACTION = "action";
+    public static final String NC_PARAM_ACTIONS[] = {"agree", "reject", "disagree"};
+    public static final String NC_PARAM_APPROVE_MESSAGE = "approveMessage";
+
+
+    public static final String NC_RESPONSE_PROP_TASK_STRUCT_LIST = "taskstructlist";
+    public static final String NC_RESPONSE_FLAG = "flag";
+    public static final String NC_RESPONSE_DES = "des";
+
+}

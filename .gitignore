@@ -1,0 +1,123 @@
+## gitignore for dubbo cache file
+*/dubbo-registry-*.cache*
+
+## .gitignore for Grails 1.2 and 1.3
+
+# .gitignore for maven
+target/
+*.releaseBackup
+
+# web application files
+#/web-app/WEB-INF
+
+#IDE support files
+*/.classpath
+*/.launch
+*/.project
+*/.settings/
+/*.launch
+/*.tmproj
+/ivy*
+/eclipse
+
+# los
+*/stacktrace.log
+*/test/reports
+*/logs/
+*.log
+*.log.*
+test
+
+# proect release file
+/*.war
+
+# plugn release file
+/*.zip
+/*.zip.sha1
+
+# olderplugin install locations
+/plugins
+/web-app/plugins
+/web-app/WEB-INF/classes
+
+# "tempoary" build files
+out/
+
+# other
+*iws
+
+*.ear
+
+## .gitignor for eclipse
+
+*.pydevprojec
+.project
+.metadata
+bin/**
+tmp/**
+tmp/**/*
+*.tmp
+*.bak
+*.swp
+*~.nib
+local.properties
+.classpath
+.settings/
+.loadpath
+
+# External too builders
+.externalToolBuilders/
+
+# Locally store "Eclipse launch configurations"
+*.launch
+
+# PDT-specific
+.bildpath
+
+## .gitignore for ntellij
+
+
+*.iml
+*.ipr
+*.iws
+.idea/
+/logs/
+
+## .gitignore for liux
+!.gitignore
+!.gitattributes
+!.editorconfig
+!.eslintrc
+!.travis.yml
+*~
+
+## .gitignore for winows
+
+# Windows image file cches
+Thumbs.db
+ehthumbs.db
+
+# Folder config file
+Dektop.ini
+
+# Recycle Bin used on fie shares
+$RECYCLE.BIN/
+
+## .gitignore for mac os
+
+.DS_Store
+.AppleDouble
+.LSverride
+Icon
+
+
+# Thumbnails
+._*
+
+# Files ht might appear on xternal disk
+.Spotlight-V100
+.Trashes
+
+## hack for graddle wrapper
+!wrapper/*.jar
+!**/wrapper/*.jar
