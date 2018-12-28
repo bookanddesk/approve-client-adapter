@@ -30,7 +30,7 @@ public class ProcessController extends BaseController {
      */
     @GetMapping("/listTodo")
     public JsonResult listTodo() {
-        return buildSuccess(ncService.getNCTask(new Date()));
+        return buildSuccess(ncService.getNCTaskList(new Date()));
     }
 
     /**
@@ -77,8 +77,8 @@ public class ProcessController extends BaseController {
      * 获取附件
      * @return
      */
-    @GetMapping("/attach")
-    public JsonResult attach() {
+    @GetMapping("/getTaskAttachments")
+    public JsonResult getTaskAttachments() {
         return buildSuccess(processService.getAttachment());
     }
 

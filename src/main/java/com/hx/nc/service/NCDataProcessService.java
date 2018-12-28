@@ -1,13 +1,13 @@
 package com.hx.nc.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.base.Preconditions;
 import com.hx.nc.bo.Constant;
+import com.hx.nc.bo.NCTask;
 import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 /**
  * @author XingJiajun
@@ -45,6 +45,27 @@ public class NCDataProcessService {
                 (List<Map<String, Object>>) dataMap.get(Constant.NC_RESPONSE_PROP_TASK_STRUCT_LIST);
 
         return tasks;
+    }
+
+    public List<NCTask> resolveNCTaskList(String result) {
+        JsonNode jsonNode = toJson(result);
+        JsonNode node = jsonNode.get(0);
+        if (!Constant.zero_string_value.equals(JsonResultService.getValue(node, Constant.NC_RESPONSE_FLAG))) {
+            throw new RuntimeException(
+                    Optional.ofNullable(JsonResultService.getValue(node, Constant.NC_RESPONSE_DES))
+                            .orElse(""));
+        }
+        ArrayNode arrayNode = JsonResultService.getArrayNode(node, Constant.NC_RESPONSE_PROP_TASK_STRUCT_LIST);
+        if (arrayNode == null) {
+            return null;
+        }
+        List<NCTask> ncTasks = new ArrayList<>(arrayNode.size());
+        Iterator<JsonNode> iterator = arrayNode.iterator();
+        while (iterator.hasNext()) {
+            JsonNode next = iterator.next();
+            ncTasks.add(JsonResultService.toObject(next.toString(), NCTask.class));
+        }
+        return ncTasks;
     }
 
 }

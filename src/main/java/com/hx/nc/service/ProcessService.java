@@ -1,5 +1,6 @@
 package com.hx.nc.service;
 
+import com.hx.nc.bo.NCTask;
 import com.hx.nc.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,8 @@ public class ProcessService extends BaseService {
 
     @Autowired
     private NCService ncService;
+    @Autowired
+    private OAService oaService;
 
     public String getNCBillDetailData() {
         String userId = getParameter(NC_PARAM_USER_ID),
@@ -62,7 +65,23 @@ public class ProcessService extends BaseService {
             throw new IllegalArgumentException("action param illegal!");
         }
 
-        return ncService.ncAction(userId, groupId, taskId, action, Optional.ofNullable(msg).orElse(action));
+        String result = ncService.ncAction(userId, groupId, taskId, action, Optional.ofNullable(msg).orElse(action));
+        if (NC_PARAM_ACTIONS[0].equals(action)) {
+            String billId = getParameter(NC_PARAM_BILL_ID),
+                    billType = getParameter(NC_PARAM_BILL_TYPE),
+                    billtypename = getParameter(NC_PARAM_BILL_TYPE_NAME);
+
+            oaService.updateTask(NCTask.newBuilder()
+                    .setBillId(billId)
+                    .setBillType(billType)
+                    .setTaskid(taskId)
+                    .setDate(null)
+                    .setCuserId(userId)
+                    .setTitle(billtypename)
+                    .build());
+        }
+
+        return result;
     }
 
     public String getAttachment() {

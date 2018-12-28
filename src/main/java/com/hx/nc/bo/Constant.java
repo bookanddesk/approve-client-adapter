@@ -8,7 +8,7 @@ package com.hx.nc.bo;
 public class Constant {
     public static final String UNDERLINE = "_";
 
-//    public static final String one_string_value = "1";
+    public static final String ONE_STRING_VALUE = "1";
     public static final String zero_string_value = "0";
 
     public static final String SERVLET_TASK = "/servlet/ncTaskList";
@@ -24,6 +24,7 @@ public class Constant {
     public static final String NC_PARAM_PK_BILL_TYPE = "pk_billtype";
     public static final String NC_PARAM_BILL_TYPE = "billtype";
     public static final String NC_PARAM_ACTION = "action";
+    public static final String NC_PARAM_BILL_TYPE_NAME = "billtypename";
     public static final String NC_PARAM_ACTIONS[] = {"agree", "reject", "disagree"};
     public static final String NC_PARAM_APPROVE_MESSAGE = "approveMessage";
 
@@ -31,5 +32,11 @@ public class Constant {
     public static final String NC_RESPONSE_PROP_TASK_STRUCT_LIST = "taskstructlist";
     public static final String NC_RESPONSE_FLAG = "flag";
     public static final String NC_RESPONSE_DES = "des";
+
+    public static final String OA_REST_URI_RECEIVE_PENDING = "/seeyon/rest/thirdpartyPending/receive/pendings";
+    public static final String OA_REST_URI_UPDATE_PENDING = "/seeyon/rest/thirdpartyPending/updatePendingState";
+
+    public static final long POLL_RATE = 1800000;//1000*60*30
+
 
 }

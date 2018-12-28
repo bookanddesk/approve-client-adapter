@@ -16,4 +16,5 @@ public class NCProperties {
     private String ip;
     private String userid;
     private String groupid;
+    private String oaIP;
 }

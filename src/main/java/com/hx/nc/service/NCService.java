@@ -1,5 +1,6 @@
 package com.hx.nc.service;
 
+import com.hx.nc.bo.NCTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -27,9 +28,9 @@ public class NCService {
     private RestTemplate rest;
 
 
-    public List<Map<String, Object>> getNCTask(Date lastDate) {
+    public List<NCTask> getNCTaskList(Date lastDate) {
         String result = rest.postForObject(buildNCTaskRequestUrl(lastDate), null, String.class);
-        return ncDataProcessService.resolveTaskList(result);
+        return ncDataProcessService.resolveNCTaskList(result);
     }
 
     public String getNCBillDetail(String userId, String groupId,
@@ -50,10 +51,11 @@ public class NCService {
 
     public String ncAction(String userId, String groupId,
                            String taskId, String action, String approveMsg) {
-        return rest.postForObject(
+        String result = rest.postForObject(
                 buildNCActionRequestUrl(userId, groupId, taskId, action, approveMsg),
                 null,
                 String.class);
+        return result;
     }
 
     public String getAttachList(String userId, String groupId, String taskId) {
