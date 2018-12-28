@@ -1,5 +1,7 @@
 package com.hx.nc.bo;
 
+import com.hx.nc.service.NCProperties;
+import com.hx.nc.utils.SpringContextUtils;
 import lombok.Data;
 
 import java.io.Serializable;
@@ -139,6 +141,7 @@ public class OATask implements Serializable {
 
     public static OATask fromNCTask(NCTask ncTask) {
         return newBuilder()
+                .setRegisterCode(getOAAppCode())
                 .setTaskId(ncTask.getTaskid())
                 .setTitle(ncTask.getTitle())
                 .setSenderName(null)
@@ -146,5 +149,9 @@ public class OATask implements Serializable {
                 .setCreationDate(ncTask.getDate())
                 .setState(Constant.zero_string_value)
                 .build();
+    }
+
+    private static String getOAAppCode() {
+       return SpringContextUtils.getBean(NCProperties.class).getRegisterCode();
     }
 }

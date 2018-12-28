@@ -19,6 +19,7 @@ public class Constant {
 
     public static final String NC_PARAM_USER_ID = "userid";
     public static final String NC_PARAM_GROUP_ID = "groupid";
+    public static final String NC_PARAM_LAST_DATE = "lastDate";
     public static final String NC_PARAM_TASK_ID = "taskId";
     public static final String NC_PARAM_BILL_ID = "billId";
     public static final String NC_PARAM_PK_BILL_TYPE = "pk_billtype";
@@ -28,15 +29,19 @@ public class Constant {
     public static final String NC_PARAM_ACTIONS[] = {"agree", "reject", "disagree"};
     public static final String NC_PARAM_APPROVE_MESSAGE = "approveMessage";
 
-
     public static final String NC_RESPONSE_PROP_TASK_STRUCT_LIST = "taskstructlist";
     public static final String NC_RESPONSE_FLAG = "flag";
     public static final String NC_RESPONSE_DES = "des";
 
+    public static final String OA_REST_HEADER_TOKEN = "token";
+    public static final String OA_REST_URI_TOKEN = "/seeyon/rest/token/{restusername}/{password}";
     public static final String OA_REST_URI_RECEIVE_PENDING = "/seeyon/rest/thirdpartyPending/receive/pendings";
     public static final String OA_REST_URI_UPDATE_PENDING = "/seeyon/rest/thirdpartyPending/updatePendingState";
+    public static final String OA_REST_RESPONSE_PROP = "success";
+    public static final String OA_REST_RESPONSE_ERROR_MSG = "errorMsgs";
 
-    public static final long POLL_RATE = 1800000;//1000*60*30
+    public static final String LAST_POLL_DATE_TIME = "lastPollDateTime";
+
 
 
 }

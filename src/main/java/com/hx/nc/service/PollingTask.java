@@ -1,12 +1,10 @@
 package com.hx.nc.service;
 
-import com.hx.nc.bo.Constant;
 import com.hx.nc.bo.NCTask;
+import com.hx.nc.utils.DateTimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -22,6 +20,8 @@ public class PollingTask {
     @Autowired
     private CacheService cacheService;
     @Autowired
+    private FileService fileService;
+    @Autowired
     private OAService oaService;
 
 //    @Scheduled(fixedRate = Constant.POLL_RATE)
@@ -33,9 +33,33 @@ public class PollingTask {
         oaService.sendTask(ncTask);
     }
 
-    private Date getLastPollDate() {
+    public String getLastPollDate() {
+        String lastPollDate = getCachedLastPollDate();
+        if (lastPollDate == null) {
+            lastPollDate = getFiledLastPollDate();
+            if (lastPollDate == null) {
+                lastPollDate = getDefaultPollDate();
+            }
+        }
+        recordPollDate(lastPollDate);
+        return lastPollDate;
+    }
+
+    private String getCachedLastPollDate() {
         return cacheService.getLastPollDate();
     }
 
+    private String getFiledLastPollDate() {
+        return fileService.getPollDateTime();
+    }
+
+    private String getDefaultPollDate() {
+        return DateTimeUtils.halfHourBefore();
+    }
+
+    private void recordPollDate(String dateTime) {
+        cacheService.cachePollDate(dateTime);
+        fileService.setPollDateTime(dateTime);
+    }
 
 }

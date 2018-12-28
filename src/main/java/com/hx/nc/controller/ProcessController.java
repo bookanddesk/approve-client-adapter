@@ -30,7 +30,7 @@ public class ProcessController extends BaseController {
      */
     @GetMapping("/listTodo")
     public JsonResult listTodo() {
-        return buildSuccess(ncService.getNCTaskList(new Date()));
+        return buildSuccess(ncService.getNCTaskList("2018-12-10"));
     }
 
     /**
@@ -84,7 +84,7 @@ public class ProcessController extends BaseController {
 
     @ExceptionHandler(Exception.class)
     public JsonResult handle(Exception e) {
-        return JsonResult.failResult(e.getMessage());
+        return buildFail(e.getMessage());
     }
 
 }

@@ -1,5 +1,6 @@
 package com.hx.nc.service;
 
+import com.hx.nc.bo.Constant;
 import com.hx.nc.bo.NCTask;
 import com.hx.nc.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +67,8 @@ public class ProcessService extends BaseService {
         }
 
         String result = ncService.ncAction(userId, groupId, taskId, action, Optional.ofNullable(msg).orElse(action));
-        if (NC_PARAM_ACTIONS[0].equals(action)) {
+
+        if (actionSuccess(result) && NC_PARAM_ACTIONS[0].equals(action)) {
             String billId = getParameter(NC_PARAM_BILL_ID),
                     billType = getParameter(NC_PARAM_BILL_TYPE),
                     billtypename = getParameter(NC_PARAM_BILL_TYPE_NAME);
@@ -96,7 +98,14 @@ public class ProcessService extends BaseService {
         return ncService.getAttachList(userId, groupId, taskId);
     }
 
-
+    private boolean actionSuccess(String result) {
+        if (StringUtils.isNotEmpty(result)) {
+            return Constant.zero_string_value.equals(
+                    JsonResultService.getValue(
+                            JsonResultService.createNode(result), NC_RESPONSE_FLAG));
+        }
+        return false;
+    }
 
 
 }

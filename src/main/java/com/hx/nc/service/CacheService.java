@@ -1,5 +1,6 @@
 package com.hx.nc.service;
 
+import com.hx.nc.bo.Constant;
 import com.hx.nc.cache.LocalCache;
 import org.springframework.stereotype.Component;
 
@@ -13,17 +14,16 @@ import java.util.Date;
 @Component
 public class CacheService {
 
-    private static final String CACHE_KEY_LST_PO_DT = "ck_lst_po_dt";
-    private static final LocalCache<String, Date> pollTimeCache = new LocalCache<>();
+    private static final LocalCache<String, String> pollTimeCache = new LocalCache<>();
     private static final LocalCache<String, String> ncOAUserIDCache = new LocalCache<>();
 
-    public Date getLastPollDate() {
-        return pollTimeCache.get(CACHE_KEY_LST_PO_DT);
+    public String getLastPollDate() {
+        return pollTimeCache.get(Constant.LAST_POLL_DATE_TIME);
     }
 
-    public void cachePollDate(Date date) {
+    public void cachePollDate(String date) {
         if (date != null)
-            pollTimeCache.put(CACHE_KEY_LST_PO_DT, date);
+            pollTimeCache.put(Constant.LAST_POLL_DATE_TIME, date);
     }
 
     public String getOAUserIdByNCId(String ncUserId) {

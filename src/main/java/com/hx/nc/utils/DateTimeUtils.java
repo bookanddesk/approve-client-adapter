@@ -1,10 +1,7 @@
 package com.hx.nc.utils;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 /**
  * @author XingJiajun
@@ -13,16 +10,29 @@ import java.util.Date;
  */
 public class DateTimeUtils {
 
-    public static Date now() {
-        return Date.from(Instant.now());
+    /**
+     * 日期格式：yyyy-MM-dd HH:mm:ss
+     */
+    public static final String FMT_DATETIME = "yyyy-MM-dd HH:mm:ss";
+
+//    public static Date now() {
+//        return Date.from(Instant.now());
+//    }
+
+//    public String fmtTime(LocalTime time) {
+//        return time.format(DateTimeFormatter.ISO_LOCAL_TIME);
+//    }
+
+    public static String fmtDateTime(LocalDateTime dateTime) {
+        return dateTime.format(DateTimeFormatter.ofPattern(FMT_DATETIME));
     }
 
-    public String fmtTime(LocalTime time) {
-        return time.format(DateTimeFormatter.ISO_LOCAL_TIME);
+    public static String halfHourBefore() {
+        return fmtDateTime(LocalDateTime.now().minusMinutes(30));
     }
 
-    public String fmtDateTime(LocalDateTime dateTime) {
-        return dateTime.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+    public static String now() {
+        return fmtDateTime(LocalDateTime.now());
     }
 
 

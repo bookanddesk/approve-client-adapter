@@ -5,9 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Date;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 import static com.hx.nc.bo.Constant.*;
@@ -28,7 +26,7 @@ public class NCService {
     private RestTemplate rest;
 
 
-    public List<NCTask> getNCTaskList(Date lastDate) {
+    public List<NCTask> getNCTaskList(String lastDate) {
         String result = rest.postForObject(buildNCTaskRequestUrl(lastDate), null, String.class);
         return ncDataProcessService.resolveNCTaskList(result);
     }
@@ -65,12 +63,14 @@ public class NCService {
                 String.class);
     }
 
-    private String buildNCTaskRequestUrl(Date lastDate) {
+    private String buildNCTaskRequestUrl(String lastDate) {
         return new StringBuilder(ncProperties.getIp())
                 .append(SERVLET_TASK)
                 .append("?")
                 .append(commonParams())
-                .append("&lastDate=").append(getLastDate(lastDate))
+                .append("&")
+                .append(NC_PARAM_LAST_DATE)
+                .append(lastDate)
                 .toString();
     }
 
@@ -130,10 +130,6 @@ public class NCService {
                 .append("&")
                 .append(NC_PARAM_TASK_ID).append("=").append(taskId)
                 .toString();
-    }
-
-    private String getLastDate(Date lstDate) {
-        return "2018-12-10";
     }
 
 }

@@ -17,4 +17,7 @@ public class NCProperties {
     private String userid;
     private String groupid;
     private String oaIP;
+    private String registerCode;//注册系统编码 应用编号
+    private String oaUser;//oa 用户名
+    private String oaPwd;//oa 密码
 }

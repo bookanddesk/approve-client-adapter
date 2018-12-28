@@ -1,21 +1,31 @@
 package com.hx.nc.service;
 
-import com.hx.nc.bo.Constant;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.hx.nc.bo.NCTask;
 import com.hx.nc.bo.OATask;
+import com.hx.nc.bo.Pendings;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static com.hx.nc.bo.Constant.*;
 
 /**
  * @author XingJiajun
  * @Date 2018/12/26 21:07
  * @Description
  */
+@Slf4j
 @Service
 public class OAService {
 
@@ -30,35 +40,71 @@ public class OAService {
                 .map(OATask::fromNCTask)
                 .collect(Collectors.toList());
 
-        String result = rest.postForObject(buildOATaskRequestUrl(),
-                new HashMap() {{
-                    put("pendingList", oaTasks);
-                }},
-                String.class);
-        System.out.println(result);
+        JsonNode result = callOARest(buildOATaskRequestUrl(),
+                Pendings.newBuilder()
+                        .setPendingList(oaTasks)
+                        .build());
+        checkOARestResult(result);
     }
 
     public void updateTask(NCTask task) {
         OATask oaTask = OATask.fromNCTask(task);
-        oaTask.setState(Constant.ONE_STRING_VALUE);
-        String result = rest.postForObject(buildOATaskUpdateRequestUrl(),
-                oaTask,
-                String.class);
-        System.out.println(result);
+        oaTask.setState(ONE_STRING_VALUE);
+        JsonNode result = callOARest(buildOATaskUpdateRequestUrl(), oaTask);
+        checkOARestResult(result);
     }
 
     private String buildOATaskRequestUrl() {
         return new StringBuilder(properties.getOaIP())
-                .append(Constant.OA_REST_URI_RECEIVE_PENDING)
+                .append(OA_REST_URI_RECEIVE_PENDING)
                 .toString();
     }
 
     private String buildOATaskUpdateRequestUrl() {
         return new StringBuilder(properties.getOaIP())
-                .append(Constant.OA_REST_URI_UPDATE_PENDING)
+                .append(OA_REST_URI_UPDATE_PENDING)
                 .toString();
     }
 
+    private String buildOATokenRequestUrl() {
+        return new StringBuilder(properties.getOaIP())
+                .append(OA_REST_URI_TOKEN)
+                .toString();
+    }
+
+    private <T> JsonNode callOARest(String url, T t) {
+        return getResult(rest.exchange(url, HttpMethod.POST, buildHttpEntity(t), JsonNode.class));
+    }
+
+    private <T> HttpEntity<T> buildHttpEntity(T t) {
+        return new HttpEntity<>(t, buildHeaders());
+    }
+
+    private MultiValueMap<String, String> buildHeaders() {
+        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+        headers.add(OA_REST_HEADER_TOKEN, getToken());
+        return headers;
+    }
+
+    private String getToken() {
+        return getResult(rest.getForEntity(buildOATokenRequestUrl(), String.class,
+                properties.getOaUser(), properties.getOaPwd()));
+    }
+
+    private <T> T getResult(ResponseEntity<T> responseEntity) {
+        if (HttpStatus.OK != responseEntity.getStatusCode()) {
+            log.error("oa response error:" + responseEntity);
+            throw new RuntimeException("oa response error:" + responseEntity);
+        }
+        return responseEntity.getBody();
+    }
+
+    private void checkOARestResult(JsonNode result) {
+        log.info(result.toString());
+        if (!JsonResultService.getBoolValue(result, OA_REST_RESPONSE_PROP)) {
+            log.error("OARestResult fail:" + result.get(OA_REST_RESPONSE_ERROR_MSG).toString());
+        }
+    }
 
 
 }
