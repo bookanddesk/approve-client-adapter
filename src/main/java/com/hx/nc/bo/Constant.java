@@ -11,11 +11,12 @@ public class Constant {
     public static final String ONE_STRING_VALUE = "1";
     public static final String zero_string_value = "0";
 
-    public static final String SERVLET_TASK = "/servlet/ncTaskList";
-    public static final String SERVLET_BILL_DETAIL = "/servlet/ncTaskBill";
-    public static final String SERVLET_APPROVE_DETAIL = "/servlet/ncApproveDetail";
-    public static final String SERVLET_ACTION = "/servlet/ncExeAction";
-    public static final String SERVLET_ATTACH_LIST = "/servlet/ncExeAction";
+    public static final String NC_SERVLET_TASK = "/servlet/ncTaskList";
+    public static final String NC_SERVLET_BILL_DETAIL = "/servlet/ncTaskBill";
+    public static final String NC_SERVLET_APPROVE_DETAIL = "/servlet/ncApproveDetail";
+    public static final String NC_SERVLET_ACTION = "/servlet/ncExeAction";
+    public static final String NC_SERVLET_ATTACH_LIST = "/servlet/ncExeAction";
+    public static final String NC_SERVLET_ASSIGN_USER_LIST = "/servlet/ncAssignUserList";
 
     public static final String NC_PARAM_USER_ID = "userid";
     public static final String NC_PARAM_GROUP_ID = "groupid";
@@ -28,6 +29,7 @@ public class Constant {
     public static final String NC_PARAM_BILL_TYPE_NAME = "billtypename";
     public static final String NC_PARAM_ACTIONS[] = {"agree", "reject", "disagree"};
     public static final String NC_PARAM_APPROVE_MESSAGE = "approveMessage";
+    public static final String NC_PARAM_C_USER_IDS = "cuserids";
 
     public static final String NC_RESPONSE_PROP_TASK_STRUCT_LIST = "taskstructlist";
     public static final String NC_RESPONSE_FLAG = "flag";
@@ -41,6 +43,7 @@ public class Constant {
     public static final String OA_REST_RESPONSE_ERROR_MSG = "errorMsgs";
 
     public static final String LAST_POLL_DATE_TIME = "lastPollDateTime";
+    public static final long LAST_POLL_DURATION = 5;
 
 
 

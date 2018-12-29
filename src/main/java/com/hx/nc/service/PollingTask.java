@@ -24,7 +24,7 @@ public class PollingTask {
     @Autowired
     private OAService oaService;
 
-//    @Scheduled(fixedRate = Constant.POLL_RATE)
+    //    @Scheduled(fixedRate = Constant.LAST_POLL_DURATION)
     public void ncTaskPolling() {
         List<NCTask> ncTask = ncService.getNCTaskList(getLastPollDate());
         if (ncTask == null && ncTask.size() == 0) {
@@ -54,7 +54,7 @@ public class PollingTask {
     }
 
     private String getDefaultPollDate() {
-        return DateTimeUtils.halfHourBefore();
+        return DateTimeUtils.defaultPollDateTime();
     }
 
     private void recordPollDate(String dateTime) {

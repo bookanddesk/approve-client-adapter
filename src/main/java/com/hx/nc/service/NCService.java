@@ -1,6 +1,7 @@
 package com.hx.nc.service;
 
 import com.hx.nc.bo.NCTask;
+import com.hx.nc.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -34,7 +35,7 @@ public class NCService {
     public String getNCBillDetail(String userId, String groupId,
                                   String taskId, String billId, String billType) {
         return rest.postForObject(
-                buildNCBillDetailRequestUrl(userId, groupId, taskId, billId, billType, SERVLET_BILL_DETAIL),
+                buildNCBillDetailRequestUrl(userId, groupId, taskId, billId, billType, NC_SERVLET_BILL_DETAIL),
                 null,
                 String.class);
     }
@@ -42,18 +43,27 @@ public class NCService {
     public String getNCApproveDetail(String userId, String groupId,
                                      String taskId, String billId, String billType) {
         return rest.postForObject(
-                buildNCBillDetailRequestUrl(userId, groupId, taskId, billId, billType, SERVLET_APPROVE_DETAIL),
+                buildNCBillDetailRequestUrl(userId, groupId, taskId, billId, billType, NC_SERVLET_APPROVE_DETAIL),
                 null,
                 String.class);
     }
 
     public String ncAction(String userId, String groupId,
-                           String taskId, String action, String approveMsg) {
+                           String taskId, String action,
+                           String approveMsg, String cUserIds) {
         String result = rest.postForObject(
-                buildNCActionRequestUrl(userId, groupId, taskId, action, approveMsg),
+                buildNCActionRequestUrl(userId, groupId, taskId, action, approveMsg, cUserIds),
                 null,
                 String.class);
         return result;
+    }
+
+    public String ncAssignUserList(String userId, String groupId,
+                                   String taskId, String billId, String action) {
+        return rest.postForObject(
+                buildNCAssignUserListRequestUrl(userId, groupId, taskId, billId, action, NC_SERVLET_ASSIGN_USER_LIST),
+                null,
+                String.class);
     }
 
     public String getAttachList(String userId, String groupId, String taskId) {
@@ -65,7 +75,7 @@ public class NCService {
 
     private String buildNCTaskRequestUrl(String lastDate) {
         return new StringBuilder(ncProperties.getIp())
-                .append(SERVLET_TASK)
+                .append(NC_SERVLET_TASK)
                 .append("?")
                 .append(commonParams())
                 .append("&")
@@ -88,22 +98,42 @@ public class NCService {
                 .toString();
     }
 
-    private String buildNCActionRequestUrl(String userId, String groupId,
-                                               String taskId, String action, String approveMsg) {
+    private String buildNCAssignUserListRequestUrl(String userId, String groupId,
+                                                   String taskId, String billId, String action,
+                                                   String servlet) {
         return new StringBuilder(ncProperties.getIp())
-                .append(SERVLET_ACTION)
+                .append(servlet)
+                .append("?")
+                .append(commonParams(userId, groupId, taskId))
+                .append("&")
+                .append(NC_PARAM_BILL_ID).append("=").append(billId)
+                .append("&")
+                .append(NC_PARAM_ACTION).append("=").append(action)
+                .toString();
+    }
+
+    private String buildNCActionRequestUrl(String userId, String groupId,
+                                           String taskId, String action,
+                                           String approveMsg, String cUserIds) {
+        StringBuilder append = new StringBuilder(ncProperties.getIp())
+                .append(NC_SERVLET_ACTION)
                 .append("?")
                 .append(commonParams(userId, groupId, taskId))
                 .append("&")
                 .append(NC_PARAM_ACTION).append("=").append(action)
                 .append("&")
-                .append(NC_PARAM_APPROVE_MESSAGE).append("=").append(approveMsg)
-                .toString();
+                .append(NC_PARAM_APPROVE_MESSAGE).append("=").append(approveMsg);
+        if (StringUtils.isNotEmpty(cUserIds)) {
+            append.append("&")
+                    .append(NC_PARAM_C_USER_IDS).append("=").append(approveMsg);
+        }
+
+        return append.toString();
     }
 
     private String buildNCAttachRequestUrl(String userId, String groupId, String taskId) {
         return new StringBuilder(ncProperties.getIp())
-                .append(SERVLET_ATTACH_LIST)
+                .append(NC_SERVLET_ATTACH_LIST)
                 .append("?")
                 .append(commonParams(userId, groupId))
                 .append("&")

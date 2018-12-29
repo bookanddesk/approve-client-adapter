@@ -53,6 +53,11 @@ public class ProcessController extends BaseController {
         return buildSuccess(processService.getNCApproveDetailData());
     }
 
+    @GetMapping("/assignCheck")
+    public JsonResult assignCheck() {
+        return buildSuccess(processService.getNCAssignUserList());
+    }
+
     /**
      * 同意
      *

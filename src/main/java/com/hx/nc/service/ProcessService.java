@@ -29,10 +29,7 @@ public class ProcessService extends BaseService {
                 taskId = getParameter(NC_PARAM_TASK_ID),
                 billId = getParameter(NC_PARAM_BILL_ID),
                 billType = getParameter(NC_PARAM_BILL_TYPE);
-        if (StringUtils.isAllEmpty(userId, groupId, taskId, billId, billType)) {
-            throw new IllegalArgumentException("one or more param is empty:[" +
-                    StringUtils.join_(userId, groupId, taskId, billId, billType) + "]");
-        }
+        paramsCheck(userId, groupId, taskId, billId, billType);
 
         return ncService.getNCBillDetail(userId, groupId, taskId, billId, billType);
     }
@@ -43,12 +40,20 @@ public class ProcessService extends BaseService {
                 taskId = getParameter(NC_PARAM_TASK_ID),
                 billId = getParameter(NC_PARAM_BILL_ID),
                 billType = getParameter(NC_PARAM_BILL_TYPE);
-        if (StringUtils.isAllEmpty(userId, groupId, taskId, billId, billType)) {
-            throw new IllegalArgumentException("one or more param is empty:[" +
-                    StringUtils.join_(userId, groupId, taskId, billId, billType)+ "]");
-        }
+        paramsCheck(userId, groupId, taskId, billId, billType);
 
         return ncService.getNCApproveDetail(userId, groupId, taskId, billId, billType);
+    }
+
+    public String getNCAssignUserList() {
+        String userId = getParameter(NC_PARAM_USER_ID),
+                groupId = getParameter(NC_PARAM_GROUP_ID),
+                taskId = getParameter(NC_PARAM_TASK_ID),
+                billId = getParameter(NC_PARAM_BILL_ID),
+                action = getParameter(NC_PARAM_ACTION);
+        paramsCheck(userId, groupId, taskId, billId, action);
+
+        return ncService.ncAssignUserList(userId, groupId, taskId, billId, action);
     }
 
     public String action() {
@@ -57,16 +62,15 @@ public class ProcessService extends BaseService {
                 taskId = getParameter(NC_PARAM_TASK_ID),
                 action = getParameter(NC_PARAM_ACTION),
                 msg = getParameter(NC_PARAM_APPROVE_MESSAGE);
-        if (StringUtils.isAllEmpty(userId, groupId, taskId, action, msg)) {
-            throw new IllegalArgumentException("one or more param is empty:[" +
-                    StringUtils.join_(userId, groupId, taskId, action, msg)+ "]");
-        }
+        paramsCheck(userId, groupId, taskId, action, msg);
 
         if (!StringUtils.equalsAny(action, NC_PARAM_ACTIONS)) {
             throw new IllegalArgumentException("action param illegal!");
         }
 
-        String result = ncService.ncAction(userId, groupId, taskId, action, Optional.ofNullable(msg).orElse(action));
+        String result = ncService.ncAction(userId, groupId, taskId, action,
+                Optional.ofNullable(msg).orElse(action),
+                getParameter(NC_PARAM_C_USER_IDS));
 
         if (actionSuccess(result) && NC_PARAM_ACTIONS[0].equals(action)) {
             String billId = getParameter(NC_PARAM_BILL_ID),
@@ -105,6 +109,13 @@ public class ProcessService extends BaseService {
                             JsonResultService.createNode(result), NC_RESPONSE_FLAG));
         }
         return false;
+    }
+
+    private void paramsCheck(String... params) {
+        if (StringUtils.isAnyEmpty(params)) {
+            throw new IllegalArgumentException("one or more param is empty:[" +
+                    StringUtils.join_(params) + "]");
+        }
     }
 
 

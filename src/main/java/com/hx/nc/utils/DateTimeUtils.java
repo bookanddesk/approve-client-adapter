@@ -1,5 +1,7 @@
 package com.hx.nc.utils;
 
+import com.hx.nc.bo.Constant;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -27,8 +29,8 @@ public class DateTimeUtils {
         return dateTime.format(DateTimeFormatter.ofPattern(FMT_DATETIME));
     }
 
-    public static String halfHourBefore() {
-        return fmtDateTime(LocalDateTime.now().minusMinutes(30));
+    public static String defaultPollDateTime() {
+        return fmtDateTime(LocalDateTime.now().minusMinutes(Constant.LAST_POLL_DURATION));
     }
 
     public static String now() {
