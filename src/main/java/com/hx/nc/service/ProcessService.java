@@ -1,7 +1,6 @@
 package com.hx.nc.service;
 
-import com.hx.nc.bo.Constant;
-import com.hx.nc.bo.NCTask;
+import com.hx.nc.bo.*;
 import com.hx.nc.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,83 +22,45 @@ public class ProcessService extends BaseService {
     @Autowired
     private OAService oaService;
 
-    public String getNCBillDetailData() {
-        String userId = getParameter(NC_PARAM_USER_ID),
-                groupId = getParameter(NC_PARAM_GROUP_ID),
-                taskId = getParameter(NC_PARAM_TASK_ID),
-                billId = getParameter(NC_PARAM_BILL_ID),
-                billType = getParameter(NC_PARAM_BILL_TYPE);
-        paramsCheck(userId, groupId, taskId, billId, billType);
-
-        return ncService.getNCBillDetail(userId, groupId, taskId, billId, billType);
+    public String getNCBillDetailData(NCBillDetailParams params) {
+        return ncService.getNCBillDetail(params.getUserid(), params.getGroupid(),
+                params.getTaskId(), params.getBillId(), params.getBilltype());
     }
 
-    public String getNCApproveDetailData() {
-        String userId = getParameter(NC_PARAM_USER_ID),
-                groupId = getParameter(NC_PARAM_GROUP_ID),
-                taskId = getParameter(NC_PARAM_TASK_ID),
-                billId = getParameter(NC_PARAM_BILL_ID),
-                billType = getParameter(NC_PARAM_BILL_TYPE);
-        paramsCheck(userId, groupId, taskId, billId, billType);
-
-        return ncService.getNCApproveDetail(userId, groupId, taskId, billId, billType);
+    public String getNCApproveDetailData(NCBillDetailParams params) {
+        return ncService.getNCApproveDetail(params.getUserid(), params.getGroupid(),
+                params.getTaskId(), params.getBillId(), params.getBilltype());
     }
 
-    public String getNCAssignUserList() {
-        String userId = getParameter(NC_PARAM_USER_ID),
-                groupId = getParameter(NC_PARAM_GROUP_ID),
-                taskId = getParameter(NC_PARAM_TASK_ID),
-                billId = getParameter(NC_PARAM_BILL_ID),
-                action = getParameter(NC_PARAM_ACTION);
-        paramsCheck(userId, groupId, taskId, billId, action);
-
-        return ncService.ncAssignUserList(userId, groupId, taskId, billId, action);
+    public String getNCAssignUserList(NCActionParams params) {
+        return ncService.ncAssignUserList(params.getUserid(), params.getGroupid(),
+                params.getTaskId(), params.getBillId(), params.getAction());
     }
 
-    public String action() {
-        String userId = getParameter(NC_PARAM_USER_ID),
-                groupId = getParameter(NC_PARAM_GROUP_ID),
-                taskId = getParameter(NC_PARAM_TASK_ID),
-                action = getParameter(NC_PARAM_ACTION),
-                msg = getParameter(NC_PARAM_APPROVE_MESSAGE);
-        paramsCheck(userId, groupId, taskId, action, msg);
+    public String action(NCActionParams params) {
 
-        if (!StringUtils.equalsAny(action, NC_PARAM_ACTIONS)) {
-            throw new IllegalArgumentException("action param illegal!");
-        }
+        String result = ncService.ncAction(params.getUserid(), params.getGroupid(),
+                params.getTaskId(), params.getAction(),
+                Optional.ofNullable(params.getApproveMessage()).orElse(params.getAction()),
+                params.getCuserids());
 
-        String result = ncService.ncAction(userId, groupId, taskId, action,
-                Optional.ofNullable(msg).orElse(action),
-                getParameter(NC_PARAM_C_USER_IDS));
-
-        if (actionSuccess(result) && NC_PARAM_ACTIONS[0].equals(action)) {
-            String billId = getParameter(NC_PARAM_BILL_ID),
-                    billType = getParameter(NC_PARAM_BILL_TYPE),
-                    billtypename = getParameter(NC_PARAM_BILL_TYPE_NAME);
-
+        if (actionSuccess(result) && NC_PARAM_ACTIONS_AGREE.equals(params.getAction())) {
             oaService.updateTask(NCTask.newBuilder()
-                    .setBillId(billId)
-                    .setBillType(billType)
-                    .setTaskid(taskId)
+                    .setBillId(params.getBillId())
+                    .setBillType(params.getBilltype())
+                    .setTaskid(params.getTaskId())
                     .setDate(null)
-                    .setCuserId(userId)
-                    .setTitle(billtypename)
+                    .setCuserId(params.getUserid())
+                    .setTitle(params.getBilltypename())
                     .build());
         }
 
         return result;
     }
 
-    public String getAttachment() {
-        String userId = getParameter(NC_PARAM_USER_ID),
-                groupId = getParameter(NC_PARAM_GROUP_ID),
-                taskId = getParameter(NC_PARAM_TASK_ID);
-        if (StringUtils.isAllEmpty(userId, groupId, taskId)) {
-            throw new IllegalArgumentException("one or more param is empty:[" +
-                    StringUtils.join_(userId, groupId, taskId)+ "]");
-        }
-
-        return ncService.getAttachList(userId, groupId, taskId);
+    public String getAttachment(NCBaseParams params) {
+        return ncService.getAttachList(params.getUserid(), params.getGroupid(),
+                params.getTaskId());
     }
 
     private boolean actionSuccess(String result) {
@@ -109,13 +70,6 @@ public class ProcessService extends BaseService {
                             JsonResultService.createNode(result), NC_RESPONSE_FLAG));
         }
         return false;
-    }
-
-    private void paramsCheck(String... params) {
-        if (StringUtils.isAnyEmpty(params)) {
-            throw new IllegalArgumentException("one or more param is empty:[" +
-                    StringUtils.join_(params) + "]");
-        }
     }
 
 

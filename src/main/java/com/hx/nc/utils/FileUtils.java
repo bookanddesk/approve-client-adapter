@@ -27,20 +27,13 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
     }
 
     public static void recordLastPollDateToJsonFile(String lastPollDate) {
-        System.out.println("000000000000");
         if (StringUtils.isEmpty(lastPollDate)) {
             return;
-        }
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
         }
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(getLPDFileName()))) {
             bufferedWriter.write(JsonResultService.toJson(new HashMap() {{
                 put(Constant.LAST_POLL_DATE_TIME, lastPollDate);
             }}));
-        System.out.println("999999999");
         } catch (IOException e) {
             e.printStackTrace();
         }

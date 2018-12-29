@@ -2,9 +2,12 @@ package com.hx.nc.controller;
 
 import com.hx.nc.bo.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.support.RequestContext;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.stream.Collectors;
 
 /**
  * @author XingJiajun
@@ -24,6 +27,14 @@ public abstract class BaseController {
         RequestContext requestContext = new RequestContext(request);
         String message = requestContext.getMessage(msgKey, objects);
         return message != null ? message : msgKey;
+    }
+
+    protected void handleValidateError(BindingResult bindingResult) {
+        if (bindingResult != null && bindingResult.hasErrors()) {
+            throw new IllegalArgumentException(bindingResult.getAllErrors().stream()
+                    .map(DefaultMessageSourceResolvable::getDefaultMessage)
+                    .collect(Collectors.joining(",")));
+        }
     }
 
     protected JsonResult buildSuccess() {

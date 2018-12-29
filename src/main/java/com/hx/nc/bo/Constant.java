@@ -26,8 +26,8 @@ public class Constant {
     public static final String NC_PARAM_PK_BILL_TYPE = "pk_billtype";
     public static final String NC_PARAM_BILL_TYPE = "billtype";
     public static final String NC_PARAM_ACTION = "action";
-    public static final String NC_PARAM_BILL_TYPE_NAME = "billtypename";
-    public static final String NC_PARAM_ACTIONS[] = {"agree", "reject", "disagree"};
+//    public static final String NC_PARAM_BILL_TYPE_NAME = "billtypename";
+    public static final String NC_PARAM_ACTIONS_AGREE = "agree";
     public static final String NC_PARAM_APPROVE_MESSAGE = "approveMessage";
     public static final String NC_PARAM_C_USER_IDS = "cuserids";
 

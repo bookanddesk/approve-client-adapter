@@ -1,12 +1,19 @@
 package com.hx.nc.controller;
 
 import com.hx.nc.bo.JsonResult;
+import com.hx.nc.bo.NCActionParams;
+import com.hx.nc.bo.NCBaseParams;
+import com.hx.nc.bo.NCBillDetailParams;
 import com.hx.nc.service.NCService;
 import com.hx.nc.service.ProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Date;
+import javax.validation.Valid;
 
 /**
  * @author XingJiajun
@@ -39,8 +46,9 @@ public class ProcessController extends BaseController {
      * @return
      */
     @GetMapping("/getApply")
-    public JsonResult getApply() {
-        return buildSuccess(processService.getNCBillDetailData());
+    public JsonResult getApply(@Valid NCBillDetailParams params, BindingResult bindingResult) {
+        handleValidateError(bindingResult);
+        return buildSuccess(processService.getNCBillDetailData(params));
     }
 
     /**
@@ -49,13 +57,15 @@ public class ProcessController extends BaseController {
      * @return
      */
     @GetMapping("/getApprove")
-    public JsonResult getApprove() {
-        return buildSuccess(processService.getNCApproveDetailData());
+    public JsonResult getApprove(@Valid NCBillDetailParams params, BindingResult bindingResult) {
+        handleValidateError(bindingResult);
+        return buildSuccess(processService.getNCApproveDetailData(params));
     }
 
     @GetMapping("/assignCheck")
-    public JsonResult assignCheck() {
-        return buildSuccess(processService.getNCAssignUserList());
+    public JsonResult assignCheck(@Valid NCActionParams params, BindingResult bindingResult) {
+        handleValidateError(bindingResult);
+        return buildSuccess(processService.getNCAssignUserList(params));
     }
 
     /**
@@ -64,8 +74,9 @@ public class ProcessController extends BaseController {
      * @return
      */
     @GetMapping("/audit")
-    public JsonResult audit() {
-        return buildSuccess(processService.action());
+    public JsonResult audit(@Valid NCActionParams params, BindingResult bindingResult) {
+        handleValidateError(bindingResult);
+        return buildSuccess(processService.action(params));
     }
 
     /**
@@ -74,8 +85,9 @@ public class ProcessController extends BaseController {
      * @return
      */
     @GetMapping("/rejectTask")
-    public JsonResult rejectTask() {
-        return buildSuccess(processService.action());
+    public JsonResult rejectTask(@Valid NCActionParams params, BindingResult bindingResult) {
+        handleValidateError(bindingResult);
+        return buildSuccess(processService.action(params));
     }
 
     /**
@@ -83,13 +95,10 @@ public class ProcessController extends BaseController {
      * @return
      */
     @GetMapping("/getTaskAttachments")
-    public JsonResult getTaskAttachments() {
-        return buildSuccess(processService.getAttachment());
+    public JsonResult getTaskAttachments(@Valid NCBaseParams params, BindingResult bindingResult) {
+        handleValidateError(bindingResult);
+        return buildSuccess(processService.getAttachment(params));
     }
 
-    @ExceptionHandler(Exception.class)
-    public JsonResult handle(Exception e) {
-        return buildFail(e.getMessage());
-    }
 
 }

@@ -4,6 +4,7 @@ import com.hx.nc.bo.Constant;
 import com.hx.nc.cache.LocalCache;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PreDestroy;
 import java.util.Date;
 
 /**

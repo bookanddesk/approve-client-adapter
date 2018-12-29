@@ -10,6 +10,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -47,6 +48,7 @@ public class OAService {
         checkOARestResult(result);
     }
 
+    @Async
     public void updateTask(NCTask task) {
         OATask oaTask = OATask.fromNCTask(task);
         oaTask.setState(ONE_STRING_VALUE);

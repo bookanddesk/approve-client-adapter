@@ -7,6 +7,9 @@ spring:
   jackson:
     serialization:
       FAIL_ON_EMPTY_BEANS: false
+
+#  profiles.active:
+
 #  mvc:
 #    servlet:
 #      path: /approve-client-adapter
@@ -24,4 +27,21 @@ hx:
     oa-user: ncrest
     oa-pwd: a1234567
 
-
+#---
+#spring:
+#  profiles: prod
+#
+#hx:
+#  nc:
+#    IP: http://172.20.54.250:8086
+#    userid: zxyadmin
+#    groupid: 0001A9100000000006H5
+#    oa-IP: http://172.25.10.53
+#    register-code: 3011
+#    oa-user: ncrest
+#    oa-pwd: a1234567
+#
+#logging:
+#  path: /logs/
+#  file: approve-client-adapter.log
+#  level: warn
