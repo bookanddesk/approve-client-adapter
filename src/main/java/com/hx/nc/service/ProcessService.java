@@ -58,7 +58,7 @@ public class ProcessService extends BaseService {
         return result;
     }
 
-    public String getAttachment(NCBaseParams params) {
+    public String getAttachment(NCTaskBaseParams params) {
         return ncService.getAttachList(params.getUserid(), params.getGroupid(),
                 params.getTaskId());
     }

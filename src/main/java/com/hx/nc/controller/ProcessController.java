@@ -2,7 +2,7 @@ package com.hx.nc.controller;
 
 import com.hx.nc.bo.JsonResult;
 import com.hx.nc.bo.NCActionParams;
-import com.hx.nc.bo.NCBaseParams;
+import com.hx.nc.bo.NCTaskBaseParams;
 import com.hx.nc.bo.NCBillDetailParams;
 import com.hx.nc.service.NCService;
 import com.hx.nc.service.ProcessService;
@@ -36,8 +36,8 @@ public class ProcessController extends BaseController {
      * @return
      */
     @GetMapping("/listTodo")
-    public JsonResult listTodo() {
-        return buildSuccess(ncService.getNCTaskList("2018-12-10"));
+    public JsonResult listTodo(String lastDate) {
+        return buildSuccess(ncService.getNCTaskList(lastDate != null ? lastDate : "2018-12-10"));
     }
 
     /**
@@ -95,7 +95,7 @@ public class ProcessController extends BaseController {
      * @return
      */
     @GetMapping("/getTaskAttachments")
-    public JsonResult getTaskAttachments(@Valid NCBaseParams params, BindingResult bindingResult) {
+    public JsonResult getTaskAttachments(@Valid NCTaskBaseParams params, BindingResult bindingResult) {
         handleValidateError(bindingResult);
         return buildSuccess(processService.getAttachment(params));
     }

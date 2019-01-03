@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank;
  * @Description
  */
 @Data
-public class NCBillDetailParams extends NCBaseParams {
+public class NCBillDetailParams extends NCTaskBaseParams {
     @NotBlank(message = "billId参数不能为空！")
     private String billId;
     @NotBlank(message = "billtype参数不能为空！")

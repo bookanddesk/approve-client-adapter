@@ -2,7 +2,6 @@ package com.hx.nc.bo;
 
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
@@ -12,7 +11,7 @@ import javax.validation.constraints.Pattern;
  * @Description
  */
 @Data
-public class NCActionParams extends NCBaseParams {
+public class NCActionParams extends NCTaskBaseParams {
     @NotNull(message = "action参数不能为空！")
     @Pattern(regexp = "agree|reject|disagree", message = "action参数不合法！")
     private String action;
