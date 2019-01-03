@@ -18,6 +18,8 @@ public class NCTask implements Serializable {
     private String date ;
     private String taskid ;
     private String title ;
+    private String mUrl;
+    private String url;
 
     public NCTask() {
     }

@@ -148,6 +148,7 @@ public class OATask implements Serializable {
                 .setThirdReceiverId(ncTask.getCuserId())
                 .setCreationDate(ncTask.getDate())
                 .setState(Constant.zero_string_value)
+                .setH5url(ncTask.getMUrl())
                 .build();
     }
 

@@ -13,11 +13,12 @@ import org.springframework.stereotype.Component;
 @Data
 @ConfigurationProperties(prefix = "hx.nc")
 public class NCProperties {
-    private String ip;
-    private String userid;
-    private String groupid;
-    private String oaIP;
-    private String registerCode;//注册系统编码 应用编号
+    private String host;//部署服务器地址
+    private String ip;//nc服务地址
+    private String userid;//nc管理员用户
+    private String groupid;//nc企业
+    private String oaIP;//oa服务地址
+    private String registerCode;//oa注册系统编码 应用编号
     private String oaUser;//oa 用户名
     private String oaPwd;//oa 密码
 }

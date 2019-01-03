@@ -30,6 +30,7 @@ public class Constant {
     public static final String NC_PARAM_ACTIONS_AGREE = "agree";
     public static final String NC_PARAM_APPROVE_MESSAGE = "approveMessage";
     public static final String NC_PARAM_C_USER_IDS = "cuserids";
+    public static final String NC_DETAIL_URL_MOBILE = "/approve-client-adapter/index.html#detail?";
 
     public static final String NC_RESPONSE_PROP_TASK_STRUCT_LIST = "taskstructlist";
     public static final String NC_RESPONSE_FLAG = "flag";
@@ -45,6 +46,12 @@ public class Constant {
     public static final String LAST_POLL_DATE_TIME = "lastPollDateTime";
     public static final long LAST_POLL_DURATION = 5;
 
+    public static final String NC_DATA_FIELD_SUFFIX_ITEM_SHOW_NAME = "itemShowName";
+    public static final String NC_DATA_FIELD_SUFFIX_ID = "_ID";
+    public static final int NC_DATA_FIELD_SUFFIX_ITEM_SHOW_NAME_LENGTH = 12;
+    public static final String NC_DATA_FIELD_SHOW_NAME = "showName";
+    public static final String NC_DATA_FIELD_SHOW_VALUE = "showValue";
+    public static final String NC_DATA_FIELD_SHOW_VALUE_ID = "showValueId";
 
 
 }

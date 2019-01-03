@@ -5,9 +5,12 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.base.Preconditions;
 import com.hx.nc.bo.Constant;
 import com.hx.nc.bo.NCTask;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+
+import static com.hx.nc.bo.Constant.*;
 
 /**
  * @author XingJiajun
@@ -16,6 +19,9 @@ import java.util.*;
  */
 @Component
 public class NCDataProcessService {
+
+    @Autowired
+    private NCProperties properties;
 
     private JsonNode toJson(String string) {
         Preconditions.checkNotNull(string);
@@ -63,9 +69,22 @@ public class NCDataProcessService {
         Iterator<JsonNode> iterator = arrayNode.iterator();
         while (iterator.hasNext()) {
             JsonNode next = iterator.next();
-            ncTasks.add(JsonResultService.toObject(next.toString(), NCTask.class));
+            NCTask task = JsonResultService.toObject(next.toString(), NCTask.class);
+            task.setMUrl(buildMUrl(task));
+            ncTasks.add(task);
         }
         return ncTasks;
+    }
+
+    private String buildMUrl(NCTask task) {
+        return new StringBuilder(properties.getHost())
+                .append(NC_DETAIL_URL_MOBILE)
+                .append(NC_PARAM_USER_ID).append("=").append(task.getCuserId())
+                .append(NC_PARAM_GROUP_ID).append("=").append(properties.getGroupid())
+                .append(NC_PARAM_TASK_ID).append("=").append(task.getTaskid())
+                .append(NC_PARAM_BILL_ID).append("=").append(task.getBillId())
+                .append(NC_PARAM_PK_BILL_TYPE).append("=").append(task.getBillType())
+                .toString();
     }
 
 }
