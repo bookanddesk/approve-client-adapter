@@ -1,4 +1,4 @@
-package com.hx.nc.bo;
+package com.hx.nc.bo.oa;
 
 import lombok.Data;
 

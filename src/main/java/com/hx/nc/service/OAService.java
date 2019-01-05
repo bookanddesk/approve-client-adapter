@@ -1,9 +1,11 @@
 package com.hx.nc.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.hx.nc.bo.NCTask;
-import com.hx.nc.bo.OATask;
-import com.hx.nc.bo.Pendings;
+import com.hx.nc.bo.ACAEnums;
+import com.hx.nc.bo.nc.NCTask;
+import com.hx.nc.bo.oa.OATask;
+import com.hx.nc.bo.oa.OATaskBaseParams;
+import com.hx.nc.bo.oa.Pendings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -49,10 +51,14 @@ public class OAService {
     }
 
     @Async
-    public void updateTask(NCTask task) {
-        OATask oaTask = OATask.fromNCTask(task);
-        oaTask.setState(ONE_STRING_VALUE);
-        JsonNode result = callOARest(buildOATaskUpdateRequestUrl(), oaTask);
+    public void updateTask(String taskId, ACAEnums.action action) {
+        JsonNode result = callOARest(buildOATaskUpdateRequestUrl(),
+                OATaskBaseParams.newBuilder()
+                        .setRegisterCode(properties.getRegisterCode())
+                        .setTaskId(taskId)
+                        .setState(action.taskNextState())
+                        .setSubState(action.taskNextSubState())
+                        .build());
         checkOARestResult(result);
     }
 

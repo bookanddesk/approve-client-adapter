@@ -1,7 +1,6 @@
 package com.hx.nc.bo;
 
-import com.alibaba.fastjson.JSON;
-import com.alibaba.fastjson.JSONObject;
+import com.hx.nc.service.JsonResultService;
 
 import java.io.Serializable;
 
@@ -22,12 +21,6 @@ public class JsonResult implements Serializable {
         this.data = data == null ? new Object() : data;
     }
 
-    public static JsonResult successPageResult(long total, Object pageData) {
-        JSONObject result = new JSONObject();
-        result.put("total", total);
-        result.put("pageData", pageData);
-        return successResult(result);
-    }
 
     public static JsonResult successResult() {
         return new JsonResult("0", "OK", null);
@@ -83,7 +76,7 @@ public class JsonResult implements Serializable {
 
     @Override
     public String toString() {
-        return JSON.toJSONString(this);
+        return JsonResultService.toJson(this);
     }
 
 

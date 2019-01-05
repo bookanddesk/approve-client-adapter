@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.google.common.base.Preconditions;
 import com.hx.nc.bo.Constant;
-import com.hx.nc.bo.NCTask;
+import com.hx.nc.bo.nc.NCTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -42,7 +42,7 @@ public class NCDataProcessService {
             throw new RuntimeException();
         }
         Map<String, Object> dataMap = list.get(0);
-        if (!Constant.zero_string_value.equals(dataMap.get(Constant.NC_RESPONSE_FLAG))) {
+        if (!Constant.ZERO_STRING_VALUE.equals(dataMap.get(Constant.NC_RESPONSE_FLAG))) {
             throw new RuntimeException(
                     Optional.ofNullable(dataMap.get(Constant.NC_RESPONSE_DES).toString())
                             .orElse(""));
@@ -56,7 +56,7 @@ public class NCDataProcessService {
     public List<NCTask> resolveNCTaskList(String result) {
         JsonNode jsonNode = toJson(result);
         JsonNode node = jsonNode.get(0);
-        if (!Constant.zero_string_value.equals(JsonResultService.getValue(node, Constant.NC_RESPONSE_FLAG))) {
+        if (!Constant.ZERO_STRING_VALUE.equals(JsonResultService.getValue(node, Constant.NC_RESPONSE_FLAG))) {
             throw new RuntimeException(
                     Optional.ofNullable(JsonResultService.getValue(node, Constant.NC_RESPONSE_DES))
                             .orElse(""));

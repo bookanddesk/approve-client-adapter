@@ -1,13 +1,17 @@
 package com.hx.nc.service;
 
-import com.hx.nc.bo.*;
+import com.hx.nc.bo.ACAEnums;
+import com.hx.nc.bo.Constant;
+import com.hx.nc.bo.nc.NCActionParams;
+import com.hx.nc.bo.nc.NCBillDetailParams;
+import com.hx.nc.bo.nc.NCTaskBaseParams;
 import com.hx.nc.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
-import static com.hx.nc.bo.Constant.*;
+import static com.hx.nc.bo.Constant.NC_RESPONSE_FLAG;
 
 /**
  * @author XingJiajun
@@ -44,15 +48,8 @@ public class ProcessService extends BaseService {
                 Optional.ofNullable(params.getApproveMessage()).orElse(params.getAction()),
                 params.getCuserids());
 
-        if (actionSuccess(result) && NC_PARAM_ACTIONS_AGREE.equals(params.getAction())) {
-            oaService.updateTask(NCTask.newBuilder()
-                    .setBillId(params.getBillId())
-                    .setBillType(params.getBilltype())
-                    .setTaskid(params.getTaskId())
-                    .setDate(null)
-                    .setCuserId(params.getUserid())
-                    .setTitle(params.getBilltypename())
-                    .build());
+        if (actionSuccess(result)) {
+            oaService.updateTask(params.getTaskId(), ACAEnums.action.valueOf(params.getAction()));
         }
 
         return result;
@@ -65,12 +62,13 @@ public class ProcessService extends BaseService {
 
     private boolean actionSuccess(String result) {
         if (StringUtils.isNotEmpty(result)) {
-            return Constant.zero_string_value.equals(
+            return Constant.ZERO_STRING_VALUE.equals(
                     JsonResultService.getValue(
                             JsonResultService.createNode(result), NC_RESPONSE_FLAG));
         }
         return false;
     }
+
 
 
 }

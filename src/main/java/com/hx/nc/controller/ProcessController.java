@@ -1,9 +1,10 @@
 package com.hx.nc.controller;
 
 import com.hx.nc.bo.JsonResult;
-import com.hx.nc.bo.NCActionParams;
-import com.hx.nc.bo.NCTaskBaseParams;
-import com.hx.nc.bo.NCBillDetailParams;
+import com.hx.nc.bo.nc.NCActionParams;
+import com.hx.nc.bo.nc.NCTask;
+import com.hx.nc.bo.nc.NCTaskBaseParams;
+import com.hx.nc.bo.nc.NCBillDetailParams;
 import com.hx.nc.service.NCService;
 import com.hx.nc.service.ProcessService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * @author XingJiajun
@@ -37,7 +39,8 @@ public class ProcessController extends BaseController {
      */
     @GetMapping("/listTodo")
     public JsonResult listTodo(String lastDate) {
-        return buildSuccess(ncService.getNCTaskList(lastDate != null ? lastDate : "2018-12-10"));
+        List<NCTask> ncTaskList = ncService.getNCTaskList(lastDate != null ? lastDate : "2018-12-10");
+        return buildSuccess(ncTaskList);
     }
 
     /**

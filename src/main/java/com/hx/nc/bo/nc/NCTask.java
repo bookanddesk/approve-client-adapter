@@ -1,4 +1,4 @@
-package com.hx.nc.bo;
+package com.hx.nc.bo.nc;
 
 import lombok.Data;
 
@@ -20,6 +20,8 @@ public class NCTask implements Serializable {
     private String title ;
     private String mUrl;
     private String url;
+    private String senderMan;
+    private String senderName;
 
     public NCTask() {
     }
@@ -32,12 +34,15 @@ public class NCTask implements Serializable {
         setDate(builder.date);
         setTaskid(builder.taskid);
         setTitle(builder.title);
+        mUrl = builder.mUrl;
+        setUrl(builder.url);
+        setSenderMan(builder.senderMan);
+        setSenderName(builder.senderName);
     }
 
     public static Builder newBuilder() {
         return new Builder();
     }
-
 
     public static final class Builder {
         private String billId;
@@ -47,6 +52,10 @@ public class NCTask implements Serializable {
         private String date;
         private String taskid;
         private String title;
+        private String mUrl;
+        private String url;
+        private String senderMan;
+        private String senderName;
 
         private Builder() {
         }
@@ -83,6 +92,26 @@ public class NCTask implements Serializable {
 
         public Builder setTitle(String title) {
             this.title = title;
+            return this;
+        }
+
+        public Builder setMUrl(String mUrl) {
+            this.mUrl = mUrl;
+            return this;
+        }
+
+        public Builder setUrl(String url) {
+            this.url = url;
+            return this;
+        }
+
+        public Builder setSenderMan(String senderMan) {
+            this.senderMan = senderMan;
+            return this;
+        }
+
+        public Builder setSenderName(String senderName) {
+            this.senderName = senderName;
             return this;
         }
 

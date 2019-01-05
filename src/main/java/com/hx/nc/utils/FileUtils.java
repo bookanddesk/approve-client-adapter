@@ -12,10 +12,10 @@ import java.util.HashMap;
  * @Date 2018/12/28 16:38
  * @Description
  */
-public class FileUtils extends org.apache.commons.io.FileUtils {
+public class FileUtils {
 
-    public static String getLastPollDateFromJsonFile() {
-        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(getLPDFileName()))) {
+    public static String getLastPollDateFromJsonFile(String filePath) {
+        try (BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath))) {
             JsonNode jsonNode = JsonResultService.createNode(bufferedReader.readLine());
             if (jsonNode != null) {
                 return JsonResultService.getValue(jsonNode, Constant.LAST_POLL_DATE_TIME);
@@ -26,11 +26,11 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
         return null;
     }
 
-    public static void recordLastPollDateToJsonFile(String lastPollDate) {
+    public static void recordLastPollDateToJsonFile(String filePath, String lastPollDate) {
         if (StringUtils.isEmpty(lastPollDate)) {
             return;
         }
-        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(getLPDFileName()))) {
+        try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(filePath))) {
             bufferedWriter.write(JsonResultService.toJson(new HashMap() {{
                 put(Constant.LAST_POLL_DATE_TIME, lastPollDate);
             }}));
@@ -39,14 +39,14 @@ public class FileUtils extends org.apache.commons.io.FileUtils {
         }
     }
 
-    private static String getLPDFileName() {
-        return new StringBuilder(new File(FileUtils.class.getResource("/").getPath()).getParent())
-                .append(File.separator)
-                .append("classes")
-                .append(File.separator)
-                .append("lpd.json")
-                .toString();
-    }
+//    private static String getLPDFileName() {
+//        return new StringBuilder(new File(FileUtils.class.getResource("/").getPath()).getParent())
+//                .append(File.separator)
+//                .append("classes")
+//                .append(File.separator)
+//                .append("lpd.json")
+//                .toString();
+//    }
 
 //    public static String getLastPollDateFromFile() {
 //        String lastPollDate = null;

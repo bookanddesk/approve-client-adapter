@@ -8,8 +8,10 @@ package com.hx.nc.bo;
 public class Constant {
     public static final String UNDERLINE = "_";
 
+    public static final String ZERO_STRING_VALUE = "0";
     public static final String ONE_STRING_VALUE = "1";
-    public static final String zero_string_value = "0";
+    public static final String TWO_STRING_VALUE = "2";
+    public static final String THREE_STRING_VALUE = "3";
 
     public static final String NC_SERVLET_TASK = "/servlet/ncTaskList";
     public static final String NC_SERVLET_BILL_DETAIL = "/servlet/ncTaskBill";

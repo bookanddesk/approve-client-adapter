@@ -1,6 +1,6 @@
 package com.hx.nc.service;
 
-import com.hx.nc.bo.NCTask;
+import com.hx.nc.bo.nc.NCTask;
 import com.hx.nc.utils.DateTimeUtils;
 import com.hx.nc.utils.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +24,8 @@ public class PollingTask {
     private CacheService cacheService;
     @Autowired
     private OAService oaService;
+    @Autowired
+    private NCProperties properties;
 
     //    @Scheduled(fixedRate = Constant.LAST_POLL_DURATION)
     public void ncTaskPolling() {
@@ -51,7 +53,7 @@ public class PollingTask {
     }
 
     private String getFiledLastPollDate() {
-        return FileUtils.getLastPollDateFromJsonFile();
+        return FileUtils.getLastPollDateFromJsonFile(properties.getFilePath());
     }
 
     private String getDefaultPollDate() {
@@ -65,12 +67,12 @@ public class PollingTask {
 
     @PostConstruct
     public void initLastPollDate() {
-        cacheService.cachePollDate(FileUtils.getLastPollDateFromJsonFile());
+        cacheService.cachePollDate(FileUtils.getLastPollDateFromJsonFile(properties.getFilePath()));
     }
 
     @PreDestroy
     public void saveLastPollDate() {
-        FileUtils.recordLastPollDateToJsonFile(cacheService.getLastPollDate());
+        FileUtils.recordLastPollDateToJsonFile(properties.getFilePath(), cacheService.getLastPollDate());
     }
 
 }

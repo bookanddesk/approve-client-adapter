@@ -21,4 +21,5 @@ public class NCProperties {
     private String registerCode;//oa注册系统编码 应用编号
     private String oaUser;//oa 用户名
     private String oaPwd;//oa 密码
+    private String filePath;
 }
