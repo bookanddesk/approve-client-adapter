@@ -1,6 +1,6 @@
 
 server:
-#  port: 8090
+  port: 8090
   servlet:
     context-path: /approve-client-adapter
 
@@ -42,9 +42,10 @@ spring:
 hx:
   nc:
     IP: http://172.17.10.64:8081
+    host: http://172.17.10.64:8090
     userid: zxyadmin
     groupid: 0001V610000000000EEN
-    oa-IP: http://172.25.10.53
+    oa-IP: http://114.118.6.18:9090
     register-code: 3011
     oa-user: ncrest
     oa-pwd: a1234567

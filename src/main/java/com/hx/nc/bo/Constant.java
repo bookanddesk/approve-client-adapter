@@ -42,7 +42,7 @@ public class Constant {
     public static final String OA_REST_URI_TOKEN = "/seeyon/rest/token/{restusername}/{password}";
     public static final String OA_REST_URI_RECEIVE_PENDING = "/seeyon/rest/thirdpartyPending/receive/pendings";
     public static final String OA_REST_URI_UPDATE_PENDING = "/seeyon/rest/thirdpartyPending/updatePendingState";
-    public static final String OA_REST_RESPONSE_PROP = "success";
+    public static final String OA_REST_RESPONSE_PROP_SUCCESS = "success";
     public static final String OA_REST_RESPONSE_ERROR_MSG = "errorMsgs";
 
     public static final String LAST_POLL_DATE_TIME = "lastPollDateTime";

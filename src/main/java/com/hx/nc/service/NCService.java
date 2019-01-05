@@ -84,8 +84,7 @@ public class NCService {
                 .append("?")
                 .append(commonParams())
                 .append("&")
-                .append(NC_PARAM_LAST_DATE)
-                .append(lastDate)
+                .append(NC_PARAM_LAST_DATE).append("=").append(lastDate)
                 .toString();
     }
 

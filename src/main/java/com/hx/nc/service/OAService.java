@@ -43,9 +43,11 @@ public class OAService {
                 .map(OATask::fromNCTask)
                 .collect(Collectors.toList());
 
+        List<OATask> oaTasks1 = oaTasks.subList(0, 2);
+
         JsonNode result = callOARest(buildOATaskRequestUrl(),
                 Pendings.newBuilder()
-                        .setPendingList(oaTasks)
+                        .setPendingList(oaTasks1)
                         .build());
         checkOARestResult(result);
     }
@@ -109,7 +111,7 @@ public class OAService {
 
     private void checkOARestResult(JsonNode result) {
         log.info(result.toString());
-        if (!JsonResultService.getBoolValue(result, OA_REST_RESPONSE_PROP)) {
+        if (!JsonResultService.getBoolValue(result, OA_REST_RESPONSE_PROP_SUCCESS)) {
             log.error("OARestResult fail:" + result.get(OA_REST_RESPONSE_ERROR_MSG).toString());
         }
     }
