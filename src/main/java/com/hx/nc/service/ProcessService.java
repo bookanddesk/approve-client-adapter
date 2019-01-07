@@ -64,7 +64,7 @@ public class ProcessService extends BaseService {
         if (StringUtils.isNotEmpty(result)) {
             return Constant.ZERO_STRING_VALUE.equals(
                     JsonResultService.getValue(
-                            JsonResultService.createNode(result), NC_RESPONSE_FLAG));
+                            JsonResultService.createNode(result).get(0), NC_RESPONSE_FLAG));
         }
         return false;
     }

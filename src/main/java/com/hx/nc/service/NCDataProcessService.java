@@ -80,9 +80,13 @@ public class NCDataProcessService {
         return new StringBuilder(properties.getHost())
                 .append(NC_DETAIL_URL_MOBILE)
                 .append(NC_PARAM_USER_ID).append("=").append(task.getCuserId())
+                .append("&")
                 .append(NC_PARAM_GROUP_ID).append("=").append(properties.getGroupid())
+                .append("&")
                 .append(NC_PARAM_TASK_ID).append("=").append(task.getTaskid())
+                .append("&")
                 .append(NC_PARAM_BILL_ID).append("=").append(task.getBillId())
+                .append("&")
                 .append(NC_PARAM_PK_BILL_TYPE).append("=").append(task.getBillType())
                 .toString();
     }

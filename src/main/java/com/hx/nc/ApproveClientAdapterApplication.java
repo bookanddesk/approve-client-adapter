@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
 @EnableScheduling
-@EnableAsync
+//@EnableAsync
 public class ApproveClientAdapterApplication {
 
     public static void main(String[] args) {

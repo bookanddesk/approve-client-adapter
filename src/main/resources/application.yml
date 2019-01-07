@@ -26,11 +26,11 @@ spring:
 hx:
   nc:
     IP: http://172.17.10.64:8081
-    host: http://localhost:${server.port}
+    host: http://114.113.234.244:8095
     userid: zxyadmin
     groupid: 0001V610000000000EEN
     oa-IP: http://114.118.6.18:9090
-    register-code: 3011
+    register-code: 3012
     oa-user: ncrest
     oa-pwd: a1234567
     file-path: D:\lpd.json
@@ -42,11 +42,11 @@ spring:
 hx:
   nc:
     IP: http://172.17.10.64:8081
-    host: http://172.17.10.64:${server.port}
+    host: http://114.113.234.244:8095
     userid: zxyadmin
     groupid: 0001V610000000000EEN
     oa-IP: http://114.118.6.18:9090
-    register-code: 3011
+    register-code: 3012
     oa-user: ncrest
     oa-pwd: a1234567
     file-path: /usr/local/project/lpd.json

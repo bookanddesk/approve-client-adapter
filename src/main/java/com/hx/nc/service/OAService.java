@@ -42,17 +42,15 @@ public class OAService {
         List<OATask> oaTasks = list.stream()
                 .map(OATask::fromNCTask)
                 .collect(Collectors.toList());
-
-        List<OATask> oaTasks1 = oaTasks.subList(0, 2);
-
+        log.info("sendOATask>> " + JsonResultService.toJson(oaTasks));
         JsonNode result = callOARest(buildOATaskRequestUrl(),
                 Pendings.newBuilder()
-                        .setPendingList(oaTasks1)
+                        .setPendingList(oaTasks)
                         .build());
         checkOARestResult(result);
     }
 
-    @Async
+//    @Async
     public void updateTask(String taskId, ACAEnums.action action) {
         JsonNode result = callOARest(buildOATaskUpdateRequestUrl(),
                 OATaskBaseParams.newBuilder()

@@ -18,10 +18,14 @@ public class OATask extends OATaskBaseParams {
     private String senderName;//第三方待办发起人姓名
     private String thirdReceiverId;//第三方待办接收人主键（保证唯一）
     private String creationDate;//待办创建时间（格式：yyyy-MM-dd HH:mm:ss）
-    private String content;
-    private String url;
-    private String h5url;
+    private String content;//原生app的下载地址
+    private String url;//PC穿透地址
+    private String h5url;//H5穿透地址
     private String appParam;
+    private String classify;//类别
+    private String contentType;//内容类型
+    private String noneBindingSender;//登录名称/人员编码/手机号/电子邮件
+    private String noneBindingReceiver;
 
     public OATask() {
     }
@@ -40,6 +44,10 @@ public class OATask extends OATaskBaseParams {
         setUrl(builder.url);
         setH5url(builder.h5url);
         setAppParam(builder.appParam);
+        setClassify(builder.classify);
+        setContentType(builder.contentType);
+        setNoneBindingSender(builder.noneBindingSender);
+        setNoneBindingReceiver(builder.noneBindingReceiver);
     }
 
 
@@ -50,7 +58,9 @@ public class OATask extends OATaskBaseParams {
                 .setTitle(ncTask.getTitle())
                 .setThirdSenderId(ncTask.getSenderMan())
                 .setSenderName(ncTask.getSenderName())
-                .setThirdReceiverId(ncTask.getCuserId())
+                .setThirdReceiverId(ncTask.getCheckManCode())
+                .setNoneBindingReceiver(ncTask.getCheckManCode())
+                .setNoneBindingSender(ncTask.getSenderName())
                 .setCreationDate(ncTask.getDate())
                 .setState(ACAEnums.OATaskState.todo.getCode())
                 .setH5url(ncTask.getMUrl())
@@ -79,6 +89,10 @@ public class OATask extends OATaskBaseParams {
         private String url;
         private String h5url;
         private String appParam;
+        private String classify;
+        private String contentType;
+        private String noneBindingSender;
+        private String noneBindingReceiver;
 
         private Builder() {
         }
@@ -145,6 +159,26 @@ public class OATask extends OATaskBaseParams {
 
         public Builder setAppParam(String appParam) {
             this.appParam = appParam;
+            return this;
+        }
+
+        public Builder setClassify(String classify) {
+            this.classify = classify;
+            return this;
+        }
+
+        public Builder setContentType(String contentType) {
+            this.contentType = contentType;
+            return this;
+        }
+
+        public Builder setNoneBindingSender(String noneBindingSender) {
+            this.noneBindingSender = noneBindingSender;
+            return this;
+        }
+
+        public Builder setNoneBindingReceiver(String noneBindingReceiver) {
+            this.noneBindingReceiver = noneBindingReceiver;
             return this;
         }
 
