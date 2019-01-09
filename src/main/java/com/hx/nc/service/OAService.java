@@ -50,7 +50,7 @@ public class OAService {
         checkOARestResult(result);
     }
 
-//    @Async
+    @Async
     public void updateTask(String taskId, ACAEnums.action action) {
         JsonNode result = callOARest(buildOATaskUpdateRequestUrl(),
                 OATaskBaseParams.newBuilder()

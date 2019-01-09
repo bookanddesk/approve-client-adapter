@@ -10,14 +10,17 @@ spring:
   jackson:
     serialization:
       FAIL_ON_EMPTY_BEANS: false
+  devtools:
+    restart:
+      trigger-file: .trigger
+#          enabled: false
+    livereload:
+      enabled: false
 
 
 #  mvc:
 #    servlet:
 #      path: /approve-client-adapter
-#  devtools:
-#    livereload:
-#      enabled: false
 
 ---
 spring:
