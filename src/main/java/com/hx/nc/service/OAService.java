@@ -6,6 +6,7 @@ import com.hx.nc.bo.nc.NCTask;
 import com.hx.nc.bo.oa.OATask;
 import com.hx.nc.bo.oa.OATaskBaseParams;
 import com.hx.nc.bo.oa.Pendings;
+import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -36,11 +37,14 @@ public class OAService {
     private NCProperties properties;
     @Autowired
     private RestTemplate rest;
+    @Autowired
+    private MeterRegistry meterRegistry;
 
 
     public void sendTask(List<NCTask> list) {
         List<OATask> oaTasks = list.stream()
                 .map(OATask::fromNCTask)
+                .peek(this::countOATasks)
                 .collect(Collectors.toList());
         log.info("sendOATask>> " + JsonResultService.toJson(oaTasks));
         JsonNode result = callOARest(buildOATaskRequestUrl(),
@@ -48,6 +52,10 @@ public class OAService {
                         .setPendingList(oaTasks)
                         .build());
         checkOARestResult(result);
+    }
+
+    private void countOATasks(OATask oaTask) {
+        meterRegistry.counter(ACA, ACA_METRICS_OA_TASKS, oaTask.getTaskId()).increment();
     }
 
     @Async

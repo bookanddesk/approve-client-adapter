@@ -6,6 +6,8 @@ package com.hx.nc.bo;
  * @Description
  */
 public class Constant {
+    public static final String ACA = "aca";
+
     public static final String UNDERLINE = "_";
 
     public static final String ZERO_STRING_VALUE = "0";
@@ -54,6 +56,9 @@ public class Constant {
     public static final String NC_DATA_FIELD_SHOW_NAME = "showName";
     public static final String NC_DATA_FIELD_SHOW_VALUE = "showValue";
     public static final String NC_DATA_FIELD_SHOW_VALUE_ID = "showValueId";
+
+    public static final String ACA_METRICS_OA_TASKS = "oaTasks";
+    public static final String ACA_METRICS_ACTIONS = "actions";
 
 
 }

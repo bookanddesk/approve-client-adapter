@@ -17,6 +17,20 @@ spring:
     livereload:
       enabled: false
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+        exclude: threaddump, heapdump
+  endpoint:
+    health:
+      show-details: always
+
+info:
+  contact:
+    email: xingjiajun88@sina.com
+
 
 #  mvc:
 #    servlet:
