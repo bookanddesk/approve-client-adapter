@@ -5,17 +5,15 @@ server:
     context-path: /approve-client-adapter
 
 spring:
-  profiles:
-    active: dev
   jackson:
     serialization:
       FAIL_ON_EMPTY_BEANS: false
   devtools:
-    restart:
-      trigger-file: .trigger
-#          enabled: false
     livereload:
       enabled: false
+  http:
+    log-request-details: true
+
 
 management:
   endpoints:
@@ -30,15 +28,6 @@ management:
 info:
   contact:
     email: xingjiajun88@sina.com
-
-
-#  mvc:
-#    servlet:
-#      path: /approve-client-adapter
-
----
-spring:
-  profiles: dev
 
 hx:
   nc:

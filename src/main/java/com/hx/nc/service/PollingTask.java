@@ -1,14 +1,10 @@
 package com.hx.nc.service;
 
-import com.hx.nc.bo.Constant;
 import com.hx.nc.bo.nc.NCTask;
 import com.hx.nc.utils.DateTimeUtils;
 import com.hx.nc.utils.FileUtils;
-import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
