@@ -2,8 +2,9 @@ package com.hx.nc.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.google.common.base.Preconditions;
 import com.hx.nc.bo.Constant;
+import com.hx.nc.data.bpm.FormFieldResponseEx;
+import com.hx.nc.data.bpm.FormResponseEx;
 import com.hx.nc.bo.nc.NCTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,15 +19,11 @@ import static com.hx.nc.bo.Constant.*;
  * @Description
  */
 @Component
-public class NCDataProcessService {
+public class NCDataProcessService extends AbstractNCDataProcessService {
 
     @Autowired
     private NCProperties properties;
 
-    private JsonNode toJson(String string) {
-        Preconditions.checkNotNull(string);
-        return JsonResultService.createNode(string);
-    }
 
     private List toList(String string) {
         return JsonResultService.toObject(toJson(string).toString(), List.class);
@@ -54,14 +51,9 @@ public class NCDataProcessService {
     }
 
     public List<NCTask> resolveNCTaskList(String result) {
-        JsonNode jsonNode = toJson(result);
-        JsonNode node = jsonNode.get(0);
-        if (!Constant.ZERO_STRING_VALUE.equals(JsonResultService.getValue(node, Constant.NC_RESPONSE_FLAG))) {
-            throw new RuntimeException(
-                    Optional.ofNullable(JsonResultService.getValue(node, Constant.NC_RESPONSE_DES))
-                            .orElse(""));
-        }
-        ArrayNode arrayNode = JsonResultService.getArrayNode(node, Constant.NC_RESPONSE_PROP_TASK_STRUCT_LIST);
+        JsonNode jsonNode = getNCDataNode(result);
+        checkNCData(jsonNode);
+        ArrayNode arrayNode = JsonResultService.getArrayNode(jsonNode, Constant.NC_RESPONSE_PROP_TASK_STRUCT_LIST);
         if (arrayNode == null) {
             return null;
         }

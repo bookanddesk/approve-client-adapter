@@ -21,7 +21,7 @@ public class BillItem {
 
     @Element(nameRule = "com.hx.nc.data.name.BillItemNameRule",
             source = Element.ElementSource.BaseFieldName)
-    private String sourceFileName;
+    private String sourceFieldName;
 
     private Boolean digest;
 

@@ -12,7 +12,7 @@ import lombok.Data;
  * @Description
  */
 @Data
-public class NCBillData extends NCDataResultBase {
+public class NCBillData {
 
     @Element(name = "head",
             type = Element.ElementType.Complex,

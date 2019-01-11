@@ -2,7 +2,6 @@ package com.hx.nc.data.wrap.response;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hx.nc.data.convert.Json2ObjectConvertor;
-import com.hx.nc.data.wrap.NCDataResultBase;
 
 /**
  * @author XingJiajun

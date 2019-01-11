@@ -1,5 +1,6 @@
 package com.hx.nc.data.wrap.response;
 
+import com.hx.nc.data.annotation.Element;
 import com.hx.nc.data.wrap.NCBillData;
 import com.hx.nc.data.wrap.NCTaskBillData;
 import lombok.Data;
@@ -10,6 +11,8 @@ import lombok.Data;
  * @Description
  */
 @Data
-public class NCTaskBillResponse extends NCBillResponse<NCBillData> {
+public class NCTaskBillResponse extends NCBaseResponse {
     private String billtypename;
+    @Element(name = "taskbill", type = Element.ElementType.Complex)
+    private NCBillData dataResult;
 }

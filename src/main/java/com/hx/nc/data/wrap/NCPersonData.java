@@ -1,5 +1,6 @@
 package com.hx.nc.data.wrap;
 
+import com.hx.nc.data.annotation.Element;
 import lombok.Data;
 
 import java.util.List;
@@ -13,5 +14,6 @@ import java.util.List;
 public class NCPersonData extends PojoMapSupport {
     private String id;
     private String name;
+    @Element(name = "isPerson", type = Element.ElementType.List)
     private List<String> isPerson;
 }

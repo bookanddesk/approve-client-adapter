@@ -9,7 +9,7 @@ import lombok.Data;
  * @Description
  */
 @Data
-public class NCTaskBillData extends NCDataResultBase {
+public class NCTaskBillData {
 
     @Element(name = "taskbill", type = Element.ElementType.Complex)
     private NCBillData dataResult;

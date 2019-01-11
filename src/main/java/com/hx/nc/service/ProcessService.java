@@ -5,10 +5,15 @@ import com.hx.nc.bo.Constant;
 import com.hx.nc.bo.nc.NCActionParams;
 import com.hx.nc.bo.nc.NCBillDetailParams;
 import com.hx.nc.bo.nc.NCTaskBaseParams;
+import com.hx.nc.data.bpm.Attachment;
 import com.hx.nc.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import yonyou.bpm.rest.response.historic.HistoricProcessInstanceResponse;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static com.hx.nc.bo.Constant.NC_RESPONSE_FLAG;
@@ -25,6 +30,8 @@ public class ProcessService extends BaseService {
     private NCService ncService;
     @Autowired
     private OAService oaService;
+    @Autowired
+    private BPMDataConvertService bpmDataConvertService;
 
     public String getNCBillDetailData(NCBillDetailParams params) {
         return ncService.getNCBillDetail(params.getUserid(), params.getGroupid(),
@@ -69,6 +76,24 @@ public class ProcessService extends BaseService {
         return false;
     }
 
+    public Map<String, Object> getApply(NCBillDetailParams params) {
+        HistoricProcessInstanceResponse instResp =
+                bpmDataConvertService.resolve2BpmApproveDetail(getNCBillDetailData(params), params);
+
+        instResp.setHistoricTasks(
+                bpmDataConvertService.resolve2BPMHisTasks(getNCApproveDetailData(params), params));
+
+        return new HashMap(){{
+            put("inst", instResp);
+            put("copyToEndTime", null);
+            put("currentUserId", params.getUserid());
+            put("nodeFormID", null);
+        }};
+    }
+
+    public List<Attachment> queryInstAttachmentList(NCTaskBaseParams params) {
+        return bpmDataConvertService.resolve2BPMAttachments(getAttachment(params));
+    }
 
 
 }

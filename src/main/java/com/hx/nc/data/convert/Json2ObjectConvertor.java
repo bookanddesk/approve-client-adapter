@@ -83,7 +83,13 @@ public class Json2ObjectConvertor {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public static <T> T convert(Class<T> clazz, JsonNode node) {
-        if (node == null || node.isNull() || node.size() == 0)
+        if (node == null) {
+            return null;
+        }
+        if (node instanceof TextNode && clazz == String.class) {
+            return (T) node.asText();
+        }
+        if (node.isNull() || node.size() == 0)
             return null;
         T obj;
         String baseFieldName = "";
