@@ -119,7 +119,7 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
             if (headTabs != null) {
                 for (BillHeadTab headTab : headTabs) {
                     String tabCode = headTab.getCode();
-                    String tabName = headTab.getName();
+                    String tabName = ncTaskBillResponse.getBilltypename();
                     detail.setName(tabName);
                     formResponse.setTitle(tabName);
                     formResponse.setDescription("");

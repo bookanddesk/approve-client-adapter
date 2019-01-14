@@ -2,6 +2,7 @@ package com.hx.nc.data.convert;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
 import com.hx.nc.data.annotation.Element;
 import com.hx.nc.data.annotation.Ignore;
@@ -130,8 +131,11 @@ public class Json2ObjectConvertor {
                     if (StringUtils.isEmpty(name)) {
                         name = field.getName();
                     }
-                    if ((!node.has(name) || node.get(name).isNull()) && !valueFromName)
+
+                    if ((!node.has(name) || node.get(name).isNull()) && !valueFromName) {
                         continue;
+                    }
+
                     if (iscomplex) {
                         Class<?> cclazz = getRealTypeOfFiled(clazz, field);
                         JsonNode jNode;
@@ -140,14 +144,13 @@ public class Json2ObjectConvertor {
                         } else {
                             jNode = node.get(name);
                         }
-                        if (jNode instanceof TextNode) {
-                            if (StringUtils.isNotEmpty(jNode.asText()))
-                                jNode = JsonResultService.createNode(jNode.asText());
-                        }
+//                        if (jNode instanceof TextNode) {
+//                            if (StringUtils.isNotEmpty(jNode.asText()))
+//                                jNode = JsonResultService.createNode(jNode.asText());
+//                        }
                         if (jNode != null) {
                             setMethod.invoke(obj, convert(cclazz, jNode));
                         }
-
                     } else if (islist) {
                         Class<?> cclazz = getRealTypeOfListElement(field);
                         List olist = new ArrayList();
@@ -167,11 +170,20 @@ public class Json2ObjectConvertor {
                             setMethod.invoke(obj, olist);
                         }
                     } else {
-                        String value;
+                        String value = null;
                         if (valueFromName) {
                             value = baseFieldName;
                         } else {
-                            value = node.get(name).asText();
+                            JsonNode valueNode = node.get(name);
+                            if (valueNode instanceof TextNode) {
+                                value = valueNode.asText();
+                            } else if (valueNode instanceof ObjectNode) {
+                                if (valueNode.has("dV")) {
+                                    value = JsonResultService.getValue(valueNode, "double");
+                                } else if (valueNode.has("year")) {
+                                    value = getDateValue(valueNode);
+                                }
+                            }
                         }
                         if (null != value && !"".equals(value)) {
                             String fieldType = field.getType().getSimpleName();
@@ -205,5 +217,12 @@ public class Json2ObjectConvertor {
             throw new RuntimeException(e);
         }
         return obj;
+    }
+
+    private static String getDateValue(JsonNode node) {
+        return new StringBuilder(JsonResultService.getValue(node, "year"))
+                .append("-").append(JsonResultService.getValue(node, "month"))
+                .append("-").append(JsonResultService.getValue(node, "day"))
+                .toString();
     }
 }
