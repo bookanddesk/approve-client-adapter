@@ -79,7 +79,6 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
             } else {
                 attachment.setType("unknown");
             }
-
         }
         return rList;
     }

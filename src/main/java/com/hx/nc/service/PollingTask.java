@@ -1,10 +1,12 @@
 package com.hx.nc.service;
 
+import com.hx.nc.bo.Constant;
 import com.hx.nc.bo.nc.NCTask;
 import com.hx.nc.utils.DateTimeUtils;
 import com.hx.nc.utils.FileUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -30,7 +32,7 @@ public class PollingTask {
     private NCProperties properties;
 
 
-//    @Scheduled(fixedRate = Constant.LAST_POLL_DURATION)
+    @Scheduled(fixedRate = Constant.LAST_POLL_DURATION)
     public void ncTaskPolling() {
         List<NCTask> ncTask = ncService.getNCTaskList(getLastPollDate());
         if (ncTask == null || ncTask.size() == 0) {
