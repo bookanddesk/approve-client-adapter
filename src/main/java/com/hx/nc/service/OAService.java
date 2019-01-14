@@ -116,7 +116,7 @@ public class OAService {
     }
 
     private void checkOARestResult(JsonNode result) {
-        log.info(result.toString());
+        log.info("OARestResult>> " + result.toString());
         if (!JsonResultService.getBoolValue(result, OA_REST_RESPONSE_PROP_SUCCESS)) {
             log.error("OARestResult fail:" + result.get(OA_REST_RESPONSE_ERROR_MSG).toString());
         }
