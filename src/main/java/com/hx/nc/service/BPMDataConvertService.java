@@ -3,10 +3,7 @@ package com.hx.nc.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hx.nc.bo.nc.NCBillDetailParams;
 import com.hx.nc.data.bill.*;
-import com.hx.nc.data.bpm.Attachment;
-import com.hx.nc.data.bpm.FormFieldResponseEx;
-import com.hx.nc.data.bpm.FormResponseEx;
-import com.hx.nc.data.bpm.HistoricTaskInstanceResponseEx;
+import com.hx.nc.data.bpm.*;
 import com.hx.nc.data.convert.DateSwap;
 import com.hx.nc.data.wrap.*;
 import com.hx.nc.data.wrap.response.*;
@@ -51,7 +48,17 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
         if (ncApproveDetailResponse == null) {
             return null;
         }
-        return getHistoricTasks(ncApproveDetailResponse, params);
+        return getHistoricTasks(ncApproveDetailResponse, params, null);
+    }
+
+    public void packHistoricProcessInstanceResponseWithNCApproveDetail(
+            String jsonStr, NCBillDetailParams params,
+            HistoricProcessInstanceResponse historicProcessInstanceResponse) {
+        NCApproveDetailResponse ncApproveDetailResponse = convertResponse(getNCDataNode(jsonStr), NCApproveDetailResponse.class);
+        if (ncApproveDetailResponse == null) {
+            return;
+        }
+        getHistoricTasks(ncApproveDetailResponse, params, historicProcessInstanceResponse);
     }
 
     @Override
@@ -282,14 +289,13 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
     }
 
     private List<HistoricTaskInstanceResponse> getHistoricTasks(NCApproveDetailResponse approveDetailResponse,
-                                                                NCBillDetailParams params) {
+                                                                NCBillDetailParams params,
+                                                                HistoricProcessInstanceResponse historicProcessInstanceResponse) {
         NCApproveHistoryDataAdapter ncApproveHistoryDataAdapter =
                 approveDetailResponse.getApprovehistorylinelist().get(0);
         String billNum = approveDetailResponse.getBillname();
-        // 历史活动集合HistoricTaskInstanceResponse
         List<HistoricTaskInstanceResponse> htis = new ArrayList<>();
         HistoricTaskInstanceResponseEx htir;
-        // //制单节点
         List<NCApproveHistoryData> ahlines = ncApproveHistoryDataAdapter.getApprovehistorylinelist();
         NCApproveHistoryData userUnhandledTask = getNcUserTask(params.getUserid(), params.getTaskId(), ahlines);
         List<NCFlowHistoryData> flowhistories = ncApproveHistoryDataAdapter.getFlowhistory();
@@ -334,7 +340,35 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
                 htir.setUserName(userUnhandledTask.getHandlername());// 暂时写死
             }
         }
+
+        if (historicProcessInstanceResponse != null) {
+            historicProcessInstanceResponse.setHistoricTasks(htis);
+            historicProcessInstanceResponse.setHistoricActivityInstances(getHistoricActivities(approveDetailResponse));
+        }
+
         return htis;
+    }
+
+    private List<HistoricActivityInstanceResponse> getHistoricActivities(
+            NCApproveDetailResponse ncApprovedDetail) {
+        List<HistoricActivityInstanceResponse> historicActivityInstanceResponses = new ArrayList<>(1);
+
+        // 制单环节
+        HistoricActivityInstanceResponseEx historicActivityInstanceResponseEx = new HistoricActivityInstanceResponseEx();
+        historicActivityInstanceResponseEx.setActivityType("startEvent");
+        historicActivityInstanceResponseEx.setActivityName("制单");
+        historicActivityInstanceResponseEx.setUserName(ncApprovedDetail
+                .getMakername());
+        historicActivityInstanceResponseEx.setAssignee(ncApprovedDetail
+                .getMakername());
+        historicActivityInstanceResponseEx.setEndTime(new DateSwap(
+                ncApprovedDetail.getSubmitdate()));
+        historicActivityInstanceResponses
+                .add(historicActivityInstanceResponseEx);
+
+        // TODO 其他环节...
+
+        return historicActivityInstanceResponses;
     }
 
     private NCApproveHistoryData getNcUserTask(String ncUser, String taskId, List<NCApproveHistoryData> ahlines) {

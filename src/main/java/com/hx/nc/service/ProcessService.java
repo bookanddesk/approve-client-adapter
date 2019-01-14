@@ -80,8 +80,12 @@ public class ProcessService extends BaseService {
         HistoricProcessInstanceResponse instResp =
                 bpmDataConvertService.resolve2BpmApproveDetail(getNCBillDetailData(params), params);
 
-        instResp.setHistoricTasks(
-                bpmDataConvertService.resolve2BPMHisTasks(getNCApproveDetailData(params), params));
+        bpmDataConvertService.packHistoricProcessInstanceResponseWithNCApproveDetail(
+                getNCApproveDetailData(params), params, instResp
+        );
+
+//        instResp.setHistoricTasks(
+//                bpmDataConvertService.resolve2BPMHisTasks(getNCApproveDetailData(params), params));
 
         return new HashMap(){{
             put("inst", instResp);
