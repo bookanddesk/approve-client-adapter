@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.TextNode;
+import com.hx.nc.data.Fields.DateField;
+import com.hx.nc.data.Fields.MoneyField;
 import com.hx.nc.data.annotation.Element;
 import com.hx.nc.data.annotation.Ignore;
 import com.hx.nc.data.name.INameRule;
@@ -90,8 +92,10 @@ public class Json2ObjectConvertor {
         if (node instanceof TextNode && clazz == String.class) {
             return (T) node.asText();
         }
-        if (node.isNull() || node.size() == 0)
+        if (node.isNull() || node.size() == 0) {
             return null;
+        }
+
         T obj;
         String baseFieldName = "";
         try {
@@ -99,17 +103,20 @@ public class Json2ObjectConvertor {
             boolean valueFromName;
             for (Class<?> cls = clazz; cls != Object.class; cls = cls.getSuperclass()) {
                 Field[] fields = cls.getDeclaredFields();
-                Annotation annotation;
                 for (Field field : fields) {
-                    PropertyDescriptor pd = new PropertyDescriptor(
-                            field.getName(), cls);
+                    PropertyDescriptor pd = new PropertyDescriptor(field.getName(), cls);
+
                     Method setMethod = pd.getWriteMethod();
-                    if (setMethod == null)
+                    if (setMethod == null) {
                         continue;
+                    }
                     setMethod.setAccessible(true);
-                    annotation = field.getAnnotation(Ignore.class);
-                    if (annotation != null)
+
+                    Annotation annotation = field.getAnnotation(Ignore.class);
+                    if (annotation != null) {
                         continue;
+                    }
+
                     annotation = field.getAnnotation(Element.class);
                     String name = null;
                     boolean iscomplex = false;
@@ -128,6 +135,7 @@ public class Json2ObjectConvertor {
                             name = getElementName(ele, node, field.getName());
                         }
                     }
+
                     if (StringUtils.isEmpty(name)) {
                         name = field.getName();
                     }
@@ -137,37 +145,25 @@ public class Json2ObjectConvertor {
                     }
 
                     if (iscomplex) {
-                        Class<?> cclazz = getRealTypeOfFiled(clazz, field);
+                        Class<?> calais = getRealTypeOfFiled(clazz, field);
                         JsonNode jNode;
                         if (fromParent) {
                             jNode = node;
                         } else {
                             jNode = node.get(name);
                         }
-//                        if (jNode instanceof TextNode) {
-//                            if (StringUtils.isNotEmpty(jNode.asText()))
-//                                jNode = JsonResultService.createNode(jNode.asText());
-//                        }
                         if (jNode != null) {
-                            setMethod.invoke(obj, convert(cclazz, jNode));
+                            setMethod.invoke(obj, convert(calais, jNode));
                         }
                     } else if (islist) {
-                        Class<?> cclazz = getRealTypeOfListElement(field);
-                        List olist = new ArrayList();
-                        JsonNode jNode = node.get(name);
-                        ArrayNode arrayNode = null;
-                        if (jNode instanceof TextNode) {
-                            if (StringUtils.isNotEmpty(jNode.asText())) {
-                                arrayNode = (ArrayNode) JsonResultService.createNode(jNode.asText());
-                            }
-                        } else {
-                            arrayNode = (ArrayNode) jNode;
-                        }
+                        ArrayNode arrayNode = JsonResultService.getArrayNode(node, name);
                         if (arrayNode != null) {
-                            for (JsonNode cnode : arrayNode) {
-                                olist.add(convert(cclazz, cnode));
+                            Class<?> calais = getRealTypeOfListElement(field);
+                            List obits = new ArrayList(arrayNode.size());
+                            for (JsonNode cNode : arrayNode) {
+                                obits.add(convert(calais, cNode));
                             }
-                            setMethod.invoke(obj, olist);
+                            setMethod.invoke(obj, obits);
                         }
                     } else {
                         String value = null;
@@ -175,14 +171,14 @@ public class Json2ObjectConvertor {
                             value = baseFieldName;
                         } else {
                             JsonNode valueNode = node.get(name);
-                            if (valueNode instanceof TextNode) {
-                                value = valueNode.asText();
-                            } else if (valueNode instanceof ObjectNode) {
+                            if (valueNode instanceof ObjectNode) {
                                 if (valueNode.has("dV")) {
-                                    value = JsonResultService.getValue(valueNode, "double");
+                                    value = JsonResultService.toObject(valueNode.toString(), MoneyField.class).toString();
                                 } else if (valueNode.has("year")) {
-                                    value = getDateValue(valueNode);
+                                    value = JsonResultService.toObject(valueNode.toString(), DateField.class).toString();
                                 }
+                            } else {
+                                value = valueNode.asText();
                             }
                         }
                         if (null != value && !"".equals(value)) {
@@ -219,10 +215,4 @@ public class Json2ObjectConvertor {
         return obj;
     }
 
-    private static String getDateValue(JsonNode node) {
-        return new StringBuilder(JsonResultService.getValue(node, "year"))
-                .append("-").append(JsonResultService.getValue(node, "month"))
-                .append("-").append(JsonResultService.getValue(node, "day"))
-                .toString();
-    }
 }
