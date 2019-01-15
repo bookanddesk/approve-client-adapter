@@ -330,6 +330,17 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
         }
 
         if (flowhistories != null) {
+
+            if (historicProcessInstanceResponse != null) {
+                flowhistories.stream()
+                        .filter(x -> "final".equalsIgnoreCase(x.getUnittype()))
+                        .findAny()
+                        .ifPresent(x -> {
+                            historicProcessInstanceResponse.setDeleteReason("end");
+                            historicProcessInstanceResponse.setEndTime(x.getTime());
+                        });
+            }
+
             // 待办节点
             if (userUnhandledTask != null
                     && userUnhandledTask.getHandledate() == null) {

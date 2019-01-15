@@ -12,8 +12,8 @@ import java.util.List;
  */
 @Data
 public class MoneyField {
-    @JsonProperty("dV")
-    private List<Integer> dV;
+//    @JsonProperty("dV")
+//    private List<Integer> dV;
     @JsonProperty("double")
     private double _double;
     private int power;
