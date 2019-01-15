@@ -48,7 +48,7 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
         if (ncApproveDetailResponse == null) {
             return null;
         }
-        return getHistoricTasks(ncApproveDetailResponse, params, null);
+        return resolveHistoricTasks(ncApproveDetailResponse, params, null);
     }
 
     public void packHistoricProcessInstanceResponseWithNCApproveDetail(
@@ -58,7 +58,7 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
         if (ncApproveDetailResponse == null) {
             return;
         }
-        getHistoricTasks(ncApproveDetailResponse, params, historicProcessInstanceResponse);
+        resolveHistoricTasks(ncApproveDetailResponse, params, historicProcessInstanceResponse);
     }
 
     @Override
@@ -288,51 +288,70 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
         formDataMap.put(id.toUpperCase(), billItem.getShowValue());
     }
 
-    private List<HistoricTaskInstanceResponse> getHistoricTasks(NCApproveDetailResponse approveDetailResponse,
-                                                                NCBillDetailParams params,
-                                                                HistoricProcessInstanceResponse historicProcessInstanceResponse) {
-        NCApproveHistoryDataAdapter ncApproveHistoryDataAdapter =
-                approveDetailResponse.getApprovehistorylinelist().get(0);
-        String billNum = approveDetailResponse.getBillname();
-        List<HistoricTaskInstanceResponse> htis = new ArrayList<>();
-        HistoricTaskInstanceResponseEx htir;
-        List<NCApproveHistoryData> ahlines = ncApproveHistoryDataAdapter.getApprovehistorylinelist();
-        NCApproveHistoryData userUnhandledTask = getNcUserTask(params.getUserid(), params.getTaskId(), ahlines);
-        List<NCFlowHistoryData> flowhistories = ncApproveHistoryDataAdapter.getFlowhistory();
+    private List<HistoricTaskInstanceResponse> resolveHistoricTasks(NCApproveDetailResponse approveDetailResponse,
+                                                                    NCBillDetailParams params,
+                                                                    HistoricProcessInstanceResponse historicProcessInstanceResponse) {
+        List<NCApproveHistoryDataAdapter> approvehistorylinelist = approveDetailResponse.getApprovehistorylinelist();
+        if (approvehistorylinelist == null || approvehistorylinelist.size() == 0) {
+            return null;
+        }
 
-        if (ahlines != null) {
-            List<CommentResponse> taskComments;
-            CommentResponse taskComment;
-            Date dt;
-            for (NCApproveHistoryData ahline : ahlines) {
-                if (ahline.getHandledate() == null)
+        NCApproveHistoryDataAdapter ncApproveHistoryDataAdapter = approvehistorylinelist.get(0);
+        List<NCApproveHistoryData> approveHisList = ncApproveHistoryDataAdapter.getApprovehistorylinelist();
+        if (approveHisList == null || approveHisList.size() == 0) {
+            return null;
+        }
+
+        String billName = approveDetailResponse.getBillname(),
+                ncUserId = params.getUserid(),
+                ncTaskId = params.getTaskId();
+        List<HistoricTaskInstanceResponse> historicTaskInstanceResponses = new ArrayList<>();
+        for (NCApproveHistoryData ncApproveHistoryData : approveHisList) {
+            String approvedId = ncApproveHistoryData.getApprovedid();
+            String handlerName = ncApproveHistoryData.getHandlername();
+            HistoricTaskInstanceResponseEx historicTaskInstanceResponseEx;
+            if (ncUserId.equals(ncApproveHistoryData.getPsnid()) &&
+                    ncTaskId.equals(approvedId)) {
+                historicTaskInstanceResponseEx = new HistoricTaskInstanceResponseEx();
+                historicTaskInstanceResponses.add(historicTaskInstanceResponseEx);
+                historicTaskInstanceResponseEx.setAssignee(ncUserId);
+                historicTaskInstanceResponseEx.setId(ncTaskId);
+                historicTaskInstanceResponseEx.setUserName(handlerName);
                     continue;
-                taskComments = new ArrayList<>();
-                htir = new HistoricTaskInstanceResponseEx();
-                htis.add(htir);
-                htir.setAssignee(ahline.getHandlername());
-                htir.setDeleteReason(ahline.getAction());// TODO:完成方式
-                dt = ahline.getHandledate();
+            }
+
+            if (ncApproveHistoryData.getHandledate() == null) {
+                continue;
+            }
+
+            historicTaskInstanceResponseEx = new HistoricTaskInstanceResponseEx();
+            historicTaskInstanceResponses.add(historicTaskInstanceResponseEx);
+            historicTaskInstanceResponseEx.setAssignee(handlerName);
+            historicTaskInstanceResponseEx.setDeleteReason(ncApproveHistoryData.getAction());// TODO:完成方式
+            Date dt = ncApproveHistoryData.getHandledate();
                 if (dt != null) {
-                    htir.setEndTime(new DateSwap(dt));// 完成时间
+                    historicTaskInstanceResponseEx.setEndTime(new DateSwap(dt));// 完成时间
                 }
-                htir.setFormKey(billNum);
-                htir.setUserName(ahline.getHandlername());
-                if (ahline.getNote() != null && !"".equals(ahline.getNote())) {
-                    taskComment = new CommentResponse();
-                    taskComment.setMessage(ahline.getNote());
-                    taskComment.setTime(new DateSwap(dt));
-                    taskComment.setTaskId(ahline.getApprovedid());
-                    taskComments.add(taskComment);
-                }
-                htir.setTaskComments(taskComments);
+            historicTaskInstanceResponseEx.setFormKey(billName);
+            historicTaskInstanceResponseEx.setUserName(handlerName);
+            String note = ncApproveHistoryData.getNote();
+            if (note != null && !"".equals(note)) {
+                List<CommentResponse> taskComments = new ArrayList<>(1);
+                CommentResponse taskComment = new CommentResponse();
+                taskComment.setMessage(note);
+                taskComment.setTime(new DateSwap(dt));
+                taskComment.setTaskId(approvedId);
+                taskComments.add(taskComment);
+                historicTaskInstanceResponseEx.setTaskComments(taskComments);
             }
         }
 
-        if (flowhistories != null) {
-
-            if (historicProcessInstanceResponse != null) {
-                flowhistories.stream()
+        if (historicProcessInstanceResponse != null) {
+            historicProcessInstanceResponse.setHistoricTasks(historicTaskInstanceResponses);
+            historicProcessInstanceResponse.setHistoricActivityInstances(resolveHistoricActivities(approveDetailResponse));
+            List<NCFlowHistoryData> flowHistoryDataList = ncApproveHistoryDataAdapter.getFlowhistory();
+            if (flowHistoryDataList != null && flowHistoryDataList.size() > 0) {
+                flowHistoryDataList.stream()
                         .filter(x -> "final".equalsIgnoreCase(x.getUnittype()))
                         .findAny()
                         .ifPresent(x -> {
@@ -340,30 +359,14 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
                             historicProcessInstanceResponse.setEndTime(x.getTime());
                         });
             }
-
-            // 待办节点
-            if (userUnhandledTask != null
-                    && userUnhandledTask.getHandledate() == null) {
-                htir = new HistoricTaskInstanceResponseEx();
-                htis.add(htir);
-                htir.setAssignee(params.getUserid());
-                htir.setId(params.getTaskId());
-                htir.setUserName(userUnhandledTask.getHandlername());// 暂时写死
-            }
         }
 
-        if (historicProcessInstanceResponse != null) {
-            historicProcessInstanceResponse.setHistoricTasks(htis);
-            historicProcessInstanceResponse.setHistoricActivityInstances(getHistoricActivities(approveDetailResponse));
-        }
-
-        return htis;
+        return historicTaskInstanceResponses;
     }
 
-    private List<HistoricActivityInstanceResponse> getHistoricActivities(
+    private List<HistoricActivityInstanceResponse> resolveHistoricActivities(
             NCApproveDetailResponse ncApprovedDetail) {
         List<HistoricActivityInstanceResponse> historicActivityInstanceResponses = new ArrayList<>(1);
-
         // 制单环节
         HistoricActivityInstanceResponseEx historicActivityInstanceResponseEx = new HistoricActivityInstanceResponseEx();
         historicActivityInstanceResponseEx.setActivityType("startEvent");
