@@ -31,7 +31,7 @@ info:
 
 hx:
   nc:
-    IP: http://172.17.10.64:8081
+    IP: http://114.113.234.244:8091
     host: http://114.113.234.244:8095
     userid: zxyadmin
     groupid: 0001V610000000000EEN

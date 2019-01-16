@@ -7,6 +7,7 @@ import com.hx.nc.data.bpm.*;
 import com.hx.nc.data.convert.DateSwap;
 import com.hx.nc.data.wrap.*;
 import com.hx.nc.data.wrap.response.*;
+import com.hx.nc.utils.StringUtils;
 import org.springframework.stereotype.Service;
 import yonyou.bpm.rest.ex.util.DateUtil;
 import yonyou.bpm.rest.response.CommentResponse;
@@ -17,6 +18,7 @@ import yonyou.bpm.rest.response.historic.HistoricProcessInstanceResponse;
 import yonyou.bpm.rest.response.historic.HistoricTaskInstanceResponse;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author XingJiajun
@@ -302,49 +304,9 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
             return null;
         }
 
-        String billName = approveDetailResponse.getBillname(),
-                ncUserId = params.getUserid(),
-                ncTaskId = params.getTaskId();
-        List<HistoricTaskInstanceResponse> historicTaskInstanceResponses = new ArrayList<>();
-        for (NCApproveHistoryData ncApproveHistoryData : approveHisList) {
-            String approvedId = ncApproveHistoryData.getApprovedid();
-            String handlerName = ncApproveHistoryData.getHandlername();
-            HistoricTaskInstanceResponseEx historicTaskInstanceResponseEx;
-            if (ncUserId.equals(ncApproveHistoryData.getPsnid()) &&
-                    ncTaskId.equals(approvedId)) {
-                historicTaskInstanceResponseEx = new HistoricTaskInstanceResponseEx();
-                historicTaskInstanceResponses.add(historicTaskInstanceResponseEx);
-                historicTaskInstanceResponseEx.setAssignee(ncUserId);
-                historicTaskInstanceResponseEx.setId(ncTaskId);
-                historicTaskInstanceResponseEx.setUserName(handlerName);
-                    continue;
-            }
-
-            if (ncApproveHistoryData.getHandledate() == null) {
-                continue;
-            }
-
-            historicTaskInstanceResponseEx = new HistoricTaskInstanceResponseEx();
-            historicTaskInstanceResponses.add(historicTaskInstanceResponseEx);
-            historicTaskInstanceResponseEx.setAssignee(handlerName);
-            historicTaskInstanceResponseEx.setDeleteReason(ncApproveHistoryData.getAction());// TODO:完成方式
-            Date dt = ncApproveHistoryData.getHandledate();
-                if (dt != null) {
-                    historicTaskInstanceResponseEx.setEndTime(new DateSwap(dt));// 完成时间
-                }
-            historicTaskInstanceResponseEx.setFormKey(billName);
-            historicTaskInstanceResponseEx.setUserName(handlerName);
-            String note = ncApproveHistoryData.getNote();
-            if (note != null && !"".equals(note)) {
-                List<CommentResponse> taskComments = new ArrayList<>(1);
-                CommentResponse taskComment = new CommentResponse();
-                taskComment.setMessage(note);
-                taskComment.setTime(new DateSwap(dt));
-                taskComment.setTaskId(approvedId);
-                taskComments.add(taskComment);
-                historicTaskInstanceResponseEx.setTaskComments(taskComments);
-            }
-        }
+        List<HistoricTaskInstanceResponse> historicTaskInstanceResponses = approveHisList.stream()
+                .map(this::buildHistoricTask)
+                .collect(Collectors.toList());
 
         if (historicProcessInstanceResponse != null) {
             historicProcessInstanceResponse.setHistoricTasks(historicTaskInstanceResponses);
@@ -362,6 +324,31 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
         }
 
         return historicTaskInstanceResponses;
+    }
+
+    private HistoricTaskInstanceResponse buildHistoricTask(NCApproveHistoryData ncApproveHistoryData) {
+        HistoricTaskInstanceResponseEx tsk = new HistoricTaskInstanceResponseEx();
+        String tskId = ncApproveHistoryData.getApprovedid();
+        Date entTime = Optional.ofNullable(ncApproveHistoryData.getHandledate())
+                .map(DateSwap::new)
+                .orElse(null);
+        tsk.setId(tskId);
+        tsk.setEndTime(entTime);
+        tsk.setAssignee(ncApproveHistoryData.getPsnid());
+        tsk.setUserName(ncApproveHistoryData.getHandlername());
+        tsk.setDeleteReason(ncApproveHistoryData.getAction());
+        tsk.setDescription(ncApproveHistoryData.getAction());
+        String note = ncApproveHistoryData.getNote();
+        if (StringUtils.isNotEmpty(note)) {
+            List<CommentResponse> taskComments = new ArrayList<>(1);
+            CommentResponse taskComment = new CommentResponse();
+            taskComment.setMessage(note);
+            taskComment.setTime(entTime);
+            taskComment.setTaskId(tskId);
+            taskComments.add(taskComment);
+            tsk.setTaskComments(taskComments);
+        }
+        return tsk;
     }
 
     private List<HistoricActivityInstanceResponse> resolveHistoricActivities(

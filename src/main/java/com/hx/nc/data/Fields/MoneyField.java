@@ -3,8 +3,6 @@ package com.hx.nc.data.Fields;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-import java.util.List;
-
 /**
  * @author XingJiajun
  * @Date 2019/1/14 20:28

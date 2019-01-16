@@ -51,7 +51,7 @@ public class ProcessController extends BaseController {
     @GetMapping("/getApply")
     public JsonResult getApply(@Valid NCBillDetailParams params, BindingResult bindingResult) {
         handleValidateError(bindingResult);
-        return buildSuccess(processService.getNCBillDetailData(params));
+        return buildSuccess(processService.getApply(params));
     }
 
     /**
@@ -100,7 +100,7 @@ public class ProcessController extends BaseController {
     @GetMapping("/getTaskAttachments")
     public JsonResult getTaskAttachments(@Valid NCTaskBaseParams params, BindingResult bindingResult) {
         handleValidateError(bindingResult);
-        return buildSuccess(processService.getAttachment(params));
+        return buildSuccess(processService.queryInstAttachmentList(params));
     }
 
 
