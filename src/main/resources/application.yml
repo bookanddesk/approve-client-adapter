@@ -16,7 +16,9 @@ spring:
     url: jdbc:h2:D:/h2/h2db
     username: aca
     password: aca
-  h2.console.enabled: true
+  h2.console:
+      enabled: true
+      settings.web-allow-others: true
   jpa.hibernate.ddl-auto: update
 #  data.jpa.repositories.bootstrap-mode: lazy
 

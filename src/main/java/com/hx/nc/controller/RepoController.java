@@ -3,7 +3,6 @@ package com.hx.nc.controller;
 import com.hx.nc.bo.JsonResult;
 import com.hx.nc.data.dao.OARestRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

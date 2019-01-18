@@ -31,6 +31,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Bean
     public ServletRegistrationBean h2servletRegistration() {
         ServletRegistrationBean registrationBean = new ServletRegistrationBean(new WebServlet());
+        registrationBean.addInitParameter("webAllowOthers", "");
         registrationBean.addUrlMappings("/h2-console/*");
         return registrationBean;
     }
