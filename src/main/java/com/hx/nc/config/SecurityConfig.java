@@ -31,9 +31,12 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/actuator/**").access("hasRole('CAPTAIN')")
+                .antMatchers("/actuator/**", "/h2-console/**").access("hasRole('CAPTAIN')")
+//                .antMatchers("/", "/**", "/h2-console/**").permitAll()
                 .anyRequest().permitAll()
                 .and().formLogin();
+
+        http.csrf().disable().headers().frameOptions().disable();
     }
 
     @Bean

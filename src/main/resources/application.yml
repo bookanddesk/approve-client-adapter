@@ -1,36 +1,35 @@
-
+#tomcat
 server:
   port: 8090
-  servlet:
-    context-path: /approve-client-adapter
+  servlet.context-path: /approve-client-adapter
 
+#spring
 spring:
   jackson:
-    serialization:
-      FAIL_ON_EMPTY_BEANS: false
+    serialization.FAIL_ON_EMPTY_BEANS: false
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
   devtools:
-    livereload:
-      enabled: false
-  http:
-    log-request-details: true
+    restart.trigger-file: .trigger
+    livereload.enabled: false
+  datasource:
+    url: jdbc:h2:D:/h2/h2db
+    username: aca
+    password: aca
+  h2.console.enabled: true
+  jpa.hibernate.ddl-auto: update
+#  data.jpa.repositories.bootstrap-mode: lazy
 
-
+#actuator
 management:
-  endpoints:
-    web:
-      exposure:
+  endpoints.web.exposure:
         include: '*'
         exclude: threaddump, heapdump
-  endpoint:
-    health:
-      show-details: always
+  endpoint.health.show-details: always
+info.contact.email: xingjiajun88@sina.com
 
-info:
-  contact:
-    email: xingjiajun88@sina.com
-
-hx:
-  nc:
+#app
+hx.nc:
     IP: http://114.113.234.244:8091
     host: http://114.113.234.244:8095
     userid: zxyadmin
@@ -42,11 +41,12 @@ hx:
     file-path: D:\lpd.json
 
 ---
-spring:
-  profiles: hx64
+spring.profiles: hx64
 
-hx:
-  nc:
+spring:
+  datasource.url: jdbc:h2:/usr/local/project/h2/h2db
+
+hx.nc:
     IP: http://172.17.10.64:8081
     host: http://114.113.234.244:8095
     userid: zxyadmin
@@ -60,15 +60,15 @@ hx:
 logging:
   path: /usr/local/project/
   file: approve-client-adapter.log
-  level:
-    root: info
+  level.root: info
 
 ---
-spring:
-  profiles: prod
+spring.profiles: prod
 
-hx:
-  nc:
+spring:
+  datasource.url: jdbc:h2:/usr/local/project/h2/h2db
+
+hx.nc:
     IP: http://172.17.10.64:8081
     host: http://172.17.10.64:${server.port}
     userid: zxyadmin
@@ -82,5 +82,4 @@ hx:
 logging:
   path: /usr/local/project/
   file: approve-client-adapter.log
-  level:
-    root: warn
+  level.root: warn

@@ -81,7 +81,7 @@ public class ProcessService extends BaseService {
                 bpmDataConvertService.resolve2BpmApproveDetail(getNCBillDetailData(params), params);
 
         bpmDataConvertService.packHistoricProcessInstanceResponseWithNCApproveDetail(
-                getNCApproveDetailData(params), params, instResp
+                getNCApproveDetailData(params), instResp
         );
 
 //        instResp.setHistoricTasks(

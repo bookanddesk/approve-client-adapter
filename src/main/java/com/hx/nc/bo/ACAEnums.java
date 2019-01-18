@@ -87,6 +87,10 @@ public class ACAEnums {
             this.value = value;
         }
 
+        public String getValue() {
+            return this.value;
+        }
+
         public abstract int taskNextState();
 
         public abstract int taskNextSubState();

@@ -50,17 +50,17 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
         if (ncApproveDetailResponse == null) {
             return null;
         }
-        return resolveHistoricTasks(ncApproveDetailResponse, params, null);
+        return resolveHistoricTasks(ncApproveDetailResponse, null);
     }
 
     public void packHistoricProcessInstanceResponseWithNCApproveDetail(
-            String jsonStr, NCBillDetailParams params,
+            String jsonStr,
             HistoricProcessInstanceResponse historicProcessInstanceResponse) {
         NCApproveDetailResponse ncApproveDetailResponse = convertResponse(getNCDataNode(jsonStr), NCApproveDetailResponse.class);
         if (ncApproveDetailResponse == null) {
             return;
         }
-        resolveHistoricTasks(ncApproveDetailResponse, params, historicProcessInstanceResponse);
+        resolveHistoricTasks(ncApproveDetailResponse, historicProcessInstanceResponse);
     }
 
     @Override
@@ -291,7 +291,6 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
     }
 
     private List<HistoricTaskInstanceResponse> resolveHistoricTasks(NCApproveDetailResponse approveDetailResponse,
-                                                                    NCBillDetailParams params,
                                                                     HistoricProcessInstanceResponse historicProcessInstanceResponse) {
         List<NCApproveHistoryDataAdapter> approvehistorylinelist = approveDetailResponse.getApprovehistorylinelist();
         if (approvehistorylinelist == null || approvehistorylinelist.size() == 0) {

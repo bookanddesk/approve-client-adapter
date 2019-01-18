@@ -1,12 +1,16 @@
 package com.hx.nc.controller;
 
+import com.hx.nc.bo.Constant;
 import com.hx.nc.bo.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.support.RequestContext;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -56,5 +60,24 @@ public abstract class BaseController {
 
     protected String getParameter(String param) {
         return request.getParameter(param);
+    }
+
+    protected PageRequest getPageRequest(String... sort) {
+        if (sort != null) {
+            return PageRequest.of(getPageNOParam(), getPageSizeParam(), Sort.by(sort).descending());
+        }
+        return PageRequest.of(getPageNOParam(), getPageSizeParam());
+    }
+
+    protected int getPageNOParam() {
+        return Optional.ofNullable(getParameter(Constant.PARAM_PAGE))
+                .map(Integer::parseInt)
+                .orElse(0);
+    }
+
+    protected int getPageSizeParam() {
+        return Optional.ofNullable(getParameter(Constant.PARAM_PAGE_SIZE))
+                .map(Integer::parseInt)
+                .orElse(10);
     }
 }

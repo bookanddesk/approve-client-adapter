@@ -3,9 +3,13 @@ package com.hx.nc.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hx.nc.bo.ACAEnums;
 import com.hx.nc.bo.nc.NCTask;
+import com.hx.nc.bo.oa.OARestResult;
 import com.hx.nc.bo.oa.OATask;
 import com.hx.nc.bo.oa.OATaskBaseParams;
 import com.hx.nc.bo.oa.Pendings;
+import com.hx.nc.data.dao.OARestRepository;
+import com.hx.nc.data.entity.OARestRecord;
+import com.hx.nc.utils.StringUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,6 +43,8 @@ public class OAService {
     private RestTemplate rest;
     @Autowired
     private MeterRegistry meterRegistry;
+    @Autowired
+    private OARestRepository oaRestRepository;
 
 
     public void sendTask(List<NCTask> list) {
@@ -47,27 +53,36 @@ public class OAService {
                 .peek(this::countOATasks)
                 .collect(Collectors.toList());
         log.info("sendOATask>> " + JsonResultService.toJson(oaTasks));
-        JsonNode result = callOARest(buildOATaskRequestUrl(),
+        OARestResult result = callOARest(buildOATaskRequestUrl(),
                 Pendings.newBuilder()
                         .setPendingList(oaTasks)
                         .build());
-        checkOARestResult(result);
+
+        saveOATaskRecord(oaTasks.stream()
+                        .map(OATask::getTaskId)
+                        .collect(Collectors.joining(",")),
+                OARestRecord.Type.sendTask,
+                result);
     }
 
     private void countOATasks(OATask oaTask) {
+        oaTask.setNoneBindingReceiver(null);
+        oaTask.setNoneBindingSender(null);
         meterRegistry.counter(ACA, ACA_METRICS_OA_TASKS, oaTask.getTaskId()).increment();
     }
 
     @Async
     public void updateTask(String taskId, ACAEnums.action action) {
-        JsonNode result = callOARest(buildOATaskUpdateRequestUrl(),
+        OARestResult result = callOARest(buildOATaskUpdateRequestUrl(),
                 OATaskBaseParams.newBuilder()
                         .setRegisterCode(properties.getRegisterCode())
                         .setTaskId(taskId)
                         .setState(action.taskNextState())
                         .setSubState(action.taskNextSubState())
                         .build());
-        checkOARestResult(result);
+
+        saveOATaskRecord(StringUtils.join_(taskId, action.getValue()),
+                OARestRecord.Type.updateTask, result);
     }
 
     private String buildOATaskRequestUrl() {
@@ -88,8 +103,9 @@ public class OAService {
                 .toString();
     }
 
-    private <T> JsonNode callOARest(String url, T t) {
-        return getResult(rest.exchange(url, HttpMethod.POST, buildHttpEntity(t), JsonNode.class));
+    private <T> OARestResult callOARest(String url, T t) {
+        JsonNode result = getResult(rest.exchange(url, HttpMethod.POST, buildHttpEntity(t), JsonNode.class));
+        return checkOARestResult(result);
     }
 
     private <T> HttpEntity<T> buildHttpEntity(T t) {
@@ -115,10 +131,29 @@ public class OAService {
         return responseEntity.getBody();
     }
 
-    private void checkOARestResult(JsonNode result) {
-        log.info("OARestResult>> " + result.toString());
-        if (!JsonResultService.getBoolValue(result, OA_REST_RESPONSE_PROP_SUCCESS)) {
-            log.error("OARestResult fail:" + result.get(OA_REST_RESPONSE_ERROR_MSG).toString());
+    private OARestResult checkOARestResult(JsonNode result) {
+        String string = result.toString();
+        log.info("OARestResult>> " + string);
+        OARestResult oaRestResult = JsonResultService.toObject(string, OARestResult.class);
+        if (!oaRestResult.isSuccess()) {
+            log.error("OARestResult fail:" + oaRestResult.toString());
+        }
+        return oaRestResult;
+    }
+
+    private void saveOATaskRecord(String params, OARestRecord.Type type,
+                                  OARestResult oaRestResult) {
+        try {
+            oaRestRepository.save(OARestRecord.builder()
+                    .params(params)
+                    .type(type)
+                    .result(oaRestResult.getErrorMsgs()
+                            .toString()
+                            .substring(0, 255)
+                    )
+                    .success((short) (oaRestResult.isSuccess() ? 0 : 1))
+                    .build());
+        } finally {
         }
     }
 

@@ -60,5 +60,8 @@ public class Constant {
     public static final String ACA_METRICS_OA_TASKS = "oaTasks";
     public static final String ACA_METRICS_ACTIONS = "actions";
 
+    public static final String PARAM_PAGE = "page";
+    public static final String PARAM_PAGE_SIZE = "size";
+
 
 }
