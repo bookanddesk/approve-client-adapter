@@ -9,7 +9,6 @@ import com.hx.nc.bo.oa.OATaskBaseParams;
 import com.hx.nc.bo.oa.Pendings;
 import com.hx.nc.data.dao.OARestRepository;
 import com.hx.nc.data.entity.OARestRecord;
-import com.hx.nc.utils.StringUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,16 +57,15 @@ public class OAService {
                         .setPendingList(oaTasks)
                         .build());
 
-        saveOATaskRecord(oaTasks.stream()
+        saveOATaskRecord("taskId: " + oaTasks.stream()
                         .map(OATask::getTaskId)
-                        .collect(Collectors.joining(",")),
+                        .collect(Collectors.joining(","))
+                        .substring(0, 255),
                 OARestRecord.Type.sendTask,
                 result);
     }
 
     private void countOATasks(OATask oaTask) {
-        oaTask.setNoneBindingReceiver(null);
-        oaTask.setNoneBindingSender(null);
         meterRegistry.counter(ACA, ACA_METRICS_OA_TASKS, oaTask.getTaskId()).increment();
     }
 
@@ -81,7 +79,7 @@ public class OAService {
                         .setSubState(action.taskNextSubState())
                         .build());
 
-        saveOATaskRecord(StringUtils.join_(taskId, action.getValue()),
+        saveOATaskRecord("taskId[" + taskId + "],action[" + action.getValue() + "]",
                 OARestRecord.Type.updateTask, result);
     }
 
