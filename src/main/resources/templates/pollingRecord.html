@@ -3,7 +3,7 @@
       xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <title>OA-Rest-Record</title>
+    <title>Polling-Record</title>
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}"/>
 </head>
 
@@ -12,7 +12,7 @@
     <div class="col-md-12">
         <div class="panel panel-primary">
             <div class="panel-heading">
-                <h4 class="panel-title">OA-Rest-Record</h4>
+                <h4 class="panel-title">Polling-Record</h4>
             </div>
             <div class="panel-body">
                 <div class="table table-responsive">
@@ -20,19 +20,15 @@
                         <thead>
                         <th class="text-center">ID</th>
                         <th class="text-center">时间</th>
-                        <th class="text-center">类型</th>
-                        <th class="text-center">标志</th>
-                        <th class="text-center">参数</th>
-                        <th class="text-center">结果</th>
+                        <th class="text-center">数量</th>
+                        <th class="text-center">下次时间</th>
                         </thead>
                         <tbody class="text-center">
-                        <tr th:each="o : ${oaRestRecords.content}">
+                        <tr th:each="o : ${pollingRecords.content}">
                             <td th:text="${o.id}">ID</td>
-                            <td th:text="${o.restAt}">时间</td>
-                            <td th:text="${o.type}">类型</td>
-                            <td th:text="${o.success}">标志</td>
-                            <td th:text="${o.params}">标志</td>
-                            <td th:text="${o.result}">结果</td>
+                            <td th:text="${o.pollAt}">时间</td>
+                            <td th:text="${o.taskCount}">任务数</td>
+                            <td th:text="${o.nextTime}">下次轮询</td>
                         </tr>
                         </tbody>
                     </table>
@@ -43,8 +39,8 @@
 </div>
 
 <ul class="pagination pagination-lg"
-    th:with="currentPage=${oaRestRecords.number}+1, totalPages=${oaRestRecords.totalPages}, therf='oaRestRecords?page='"
-    th:if="${oaRestRecords.totalPages > 0}">
+    th:with="currentPage=${pollingRecords.number}+1, totalPages=${pollingRecords.totalPages}, therf='pollingRecords?page='"
+    th:if="${pollingRecords.totalPages > 0}">
     <li th:if="${currentPage>1}"><a th:href="@{${therf} + ${currentPage-2}}">上一页</a></li>
     <li th:if="${currentPage-3>=1}"><a th:href="@{${therf} + ${currentPage-4}}" th:text="${currentPage-3}">1</a></li>
     <li th:if="${currentPage-2>=1}"><a th:href="@{${therf} + ${currentPage-3}}" th:text="${currentPage-2}">1</a></li>

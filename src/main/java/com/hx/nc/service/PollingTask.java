@@ -2,6 +2,7 @@ package com.hx.nc.service;
 
 import com.hx.nc.bo.Constant;
 import com.hx.nc.bo.nc.NCTask;
+import com.hx.nc.data.entity.PollingRecord;
 import com.hx.nc.utils.DateTimeUtils;
 import com.hx.nc.utils.FileUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * @author XingJiajun
@@ -32,12 +34,17 @@ public class PollingTask {
     private OAService oaService;
     @Autowired
     private NCProperties properties;
+    @Autowired
+    private RepoService repoService;
 
 
     @Scheduled(fixedRate = Constant.LAST_POLL_DURATION)
     public void ncTaskPolling() {
-        List<NCTask> ncTask = ncService.getNCTaskList(getLastPollDate());
-        if (ncTask == null || ncTask.size() == 0) {
+        String lastPollDate = getLastPollDate();
+        List<NCTask> ncTask = ncService.getNCTaskList(lastPollDate);
+        int taskCount = ncTask != null ? ncTask.size() : 0;
+        recordH2Polling(lastPollDate, taskCount);
+        if (taskCount == 0) {
             return;
         }
         oaService.sendTask(ncTask);
@@ -46,9 +53,12 @@ public class PollingTask {
     public String getLastPollDate() {
         String lastPollDate = getCachedLastPollDate();
         if (lastPollDate == null) {
-            lastPollDate = getFiledLastPollDate();
+            lastPollDate = getH2LastPollDate();
             if (lastPollDate == null) {
-                lastPollDate = getDefaultPollDate();
+                lastPollDate = getFiledLastPollDate();
+                if (lastPollDate == null) {
+                    lastPollDate = getDefaultPollDate();
+                }
             }
         }
         recordPollDate(DateTimeUtils.now());
@@ -58,6 +68,11 @@ public class PollingTask {
 
     private String getCachedLastPollDate() {
         return cacheService.getLastPollDate();
+    }
+
+    private String getH2LastPollDate() {
+        return Optional.ofNullable(repoService.getLastPollingRecord())
+                .orElse(null);
     }
 
     private String getFiledLastPollDate() {
@@ -72,6 +87,18 @@ public class PollingTask {
         cacheService.cachePollDate(dateTime);
     }
 
+    private void recordH2Polling(String lastPollDate, int taskCount) {
+        repoService.savePollingRecord(PollingRecord.builder()
+                .pollAt(lastPollDate)
+                .taskCount(taskCount)
+                .nextTime(getCachedLastPollDate())
+                .build());
+    }
+
+    @Scheduled(cron = "0 0 1 * * ?")
+    public void deletePollingRecord() {
+        repoService.deleteRedundantPollingRecords(DateTimeUtils.defaultPollingRecordBefore());
+    }
 
     @PostConstruct
     public void initLastPollDate() {

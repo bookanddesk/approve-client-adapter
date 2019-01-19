@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @Date 2019/1/17 14:46
  * @Description
  */
-public interface OARestRepository extends JpaRepository<OARestRecord, String>  {
+public interface OARestRepository extends JpaRepository<OARestRecord, Long>  {
 }

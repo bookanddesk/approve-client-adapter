@@ -43,7 +43,7 @@ public class OAService {
     @Autowired
     private MeterRegistry meterRegistry;
     @Autowired
-    private OARestRepository oaRestRepository;
+    private RepoService repoService;
 
 
     public void sendTask(List<NCTask> list) {
@@ -142,7 +142,7 @@ public class OAService {
     private void saveOATaskRecord(String params, OARestRecord.Type type,
                                   OARestResult oaRestResult) {
         try {
-            oaRestRepository.save(OARestRecord.builder()
+            repoService.saveOARestRecord(OARestRecord.builder()
                     .params(params)
                     .type(type)
                     .result(oaRestResult.getErrorMsgs()

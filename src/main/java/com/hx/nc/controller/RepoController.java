@@ -1,8 +1,9 @@
 package com.hx.nc.controller;
 
 import com.hx.nc.bo.JsonResult;
-import com.hx.nc.data.dao.OARestRepository;
 import com.hx.nc.data.entity.OARestRecord;
+import com.hx.nc.data.entity.PollingRecord;
+import com.hx.nc.service.RepoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Controller;
@@ -20,24 +21,31 @@ import org.springframework.web.context.request.WebRequest;
 @RequestMapping("repo")
 public class RepoController extends BaseController {
 
-    private OARestRepository oaRestRepository;
+    private RepoService repoService;
 
     @Autowired
-    public RepoController(OARestRepository oaRestRepository) {
-        this.oaRestRepository = oaRestRepository;
+    public RepoController(RepoService repoService) {
+        this.repoService = repoService;
     }
 
     @GetMapping("/oaRest")
     public @ResponseBody
     JsonResult OARest() {
-        return buildSuccess(oaRestRepository.findAll(getPageRequest("restAt")));
+        return buildSuccess(repoService.pageOARestRecords(getPageRequest("restAt")));
     }
 
     @GetMapping("/oaRestRecords")
     public String OARestRecords(WebRequest request) {
-        Page<OARestRecord> restAt = oaRestRepository.findAll(getPageRequest("restAt"));
+        Page<OARestRecord> restAt = repoService.pageOARestRecords(getPageRequest("restAt"));
         request.setAttribute("oaRestRecords", restAt, WebRequest.SCOPE_REQUEST);
         return "oaRestRecord";
+    }
+
+    @GetMapping("/pollingRecords")
+    public String pollingRecords(WebRequest request) {
+        Page<PollingRecord> restAt = repoService.pagePollingRecords(getPageRequest("pollAt"));
+        request.setAttribute("pollingRecords", restAt, WebRequest.SCOPE_REQUEST);
+        return "pollingRecord";
     }
 
 }
