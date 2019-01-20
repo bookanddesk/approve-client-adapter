@@ -17,13 +17,16 @@ import javax.validation.constraints.NotBlank;
 @Entity
 @Table(name = "polling_record")
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
-public class PollingRecord {
+public class NCPollingRecord {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     @NotBlank
     @Column(name = "poll_at")
     private String pollAt;
+    @NotBlank
+    @Column(name = "nc_result")
+    private String ncResult;
     @Column(name = "task_count")
     private Integer taskCount;
     @NotBlank
@@ -31,9 +34,10 @@ public class PollingRecord {
     private String nextTime;
 
     @Builder
-    public PollingRecord(Long id, @NotBlank String pollAt, Integer taskCount, String nextTime) {
+    public NCPollingRecord(Long id, @NotBlank String pollAt, @NotBlank String ncResult, Integer taskCount, String nextTime) {
         this.id = id;
         this.pollAt = pollAt;
+        this.ncResult = ncResult;
         this.taskCount = taskCount;
         this.nextTime = nextTime;
     }

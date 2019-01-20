@@ -2,7 +2,7 @@ package com.hx.nc.controller;
 
 import com.hx.nc.bo.JsonResult;
 import com.hx.nc.data.entity.OARestRecord;
-import com.hx.nc.data.entity.PollingRecord;
+import com.hx.nc.data.entity.NCPollingRecord;
 import com.hx.nc.service.RepoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -43,7 +43,7 @@ public class RepoController extends BaseController {
 
     @GetMapping("/pollingRecords")
     public String pollingRecords(WebRequest request) {
-        Page<PollingRecord> restAt = repoService.pagePollingRecords(getPageRequest("pollAt"));
+        Page<NCPollingRecord> restAt = repoService.pagePollingRecords(getPageRequest("pollAt"));
         request.setAttribute("pollingRecords", restAt, WebRequest.SCOPE_REQUEST);
         return "pollingRecord";
     }

@@ -3,12 +3,11 @@ package com.hx.nc.service;
 import com.hx.nc.data.dao.OARestRepository;
 import com.hx.nc.data.dao.PollingRepository;
 import com.hx.nc.data.entity.OARestRecord;
-import com.hx.nc.data.entity.PollingRecord;
+import com.hx.nc.data.entity.NCPollingRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -41,15 +40,15 @@ public class RepoService {
         return oaRestRepository.findAll(pageable);
     }
 
-    public PollingRecord savePollingRecord(PollingRecord pollingRecord) {
+    public NCPollingRecord savePollingRecord(NCPollingRecord pollingRecord) {
         return pollingRepository.save(pollingRecord);
     }
 
-    public List<PollingRecord> listAllPollingRecords() {
+    public List<NCPollingRecord> listAllPollingRecords() {
         return pollingRepository.findAll();
     }
 
-    public Page<PollingRecord> pagePollingRecords(Pageable pageable) {
+    public Page<NCPollingRecord> pagePollingRecords(Pageable pageable) {
         return pollingRepository.findAll(pageable);
     }
 

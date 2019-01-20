@@ -3,12 +3,9 @@ package com.hx.nc.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.hx.nc.bo.ACAEnums;
 import com.hx.nc.bo.nc.NCTask;
-import com.hx.nc.bo.oa.OARestResult;
-import com.hx.nc.bo.oa.OATask;
-import com.hx.nc.bo.oa.OATaskBaseParams;
-import com.hx.nc.bo.oa.Pendings;
-import com.hx.nc.data.dao.OARestRepository;
+import com.hx.nc.bo.oa.*;
 import com.hx.nc.data.entity.OARestRecord;
+import com.hx.nc.utils.StringUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,35 +49,49 @@ public class OAService {
                 .peek(this::countOATasks)
                 .collect(Collectors.toList());
         log.info("sendOATask>> " + JsonResultService.toJson(oaTasks));
-        OARestResult result = callOARest(buildOATaskRequestUrl(),
-                Pendings.newBuilder()
-                        .setPendingList(oaTasks)
-                        .build());
-
-        saveOATaskRecord("taskId: " + oaTasks.stream()
-                        .map(OATask::getTaskId)
-                        .collect(Collectors.joining(","))
-                        .substring(0, 255),
-                OARestRecord.Type.sendTask,
-                result);
+        OARestResult result = null;
+        try {
+            result = callOARest(buildOATaskRequestUrl(),
+                    Pendings.newBuilder()
+                            .setPendingList(oaTasks)
+                            .build());
+        } catch (Exception e) {
+            log.error("sendOATask error>> " + e.getMessage());
+            result = afterException(e);
+        } finally {
+            saveOATaskRecord(StringUtils.substring(
+                    oaTasks.stream()
+                            .map(OATask::getTaskId)
+                            .collect(Collectors.joining(",", "taskIds[", "]")),
+                    0, 255),
+                    OARestRecord.Type.sendTask,
+                    result);
+        }
     }
 
     private void countOATasks(OATask oaTask) {
+        oaTask.setNoneBindingReceiver(null);
         meterRegistry.counter(ACA, ACA_METRICS_OA_TASKS, oaTask.getTaskId()).increment();
     }
 
     @Async
     public void updateTask(String taskId, ACAEnums.action action) {
-        OARestResult result = callOARest(buildOATaskUpdateRequestUrl(),
-                OATaskBaseParams.newBuilder()
-                        .setRegisterCode(properties.getRegisterCode())
-                        .setTaskId(taskId)
-                        .setState(action.taskNextState())
-                        .setSubState(action.taskNextSubState())
-                        .build());
-
-        saveOATaskRecord("taskId[" + taskId + "],action[" + action.getValue() + "]",
-                OARestRecord.Type.updateTask, result);
+        OARestResult result = null;
+        try {
+            result = callOARest(buildOATaskUpdateRequestUrl(),
+                    OATaskBaseParams.newBuilder()
+                            .setRegisterCode(properties.getRegisterCode())
+                            .setTaskId(taskId)
+                            .setState(action.taskNextState())
+                            .setSubState(action.taskNextSubState())
+                            .build());
+        } catch (Exception e) {
+            log.error("updateOATask error>> " + e.getMessage());
+            result = afterException(e);
+        } finally {
+            saveOATaskRecord("taskId[" + taskId + "],action[" + action.getValue() + "]",
+                    OARestRecord.Type.updateTask, result);
+        }
     }
 
     private String buildOATaskRequestUrl() {
@@ -143,11 +154,10 @@ public class OAService {
                                   OARestResult oaRestResult) {
         try {
             repoService.saveOARestRecord(OARestRecord.builder()
-                    .params(params)
+                    .params(StringUtils.substring(params, 0, 255))
                     .type(type)
-                    .result(oaRestResult.getErrorMsgs()
-                            .toString()
-                            .substring(0, 255)
+                    .result(StringUtils.substring(oaRestResult.getErrorMsgs()
+                            .toString(), 0, 255)
                     )
                     .success((short) (oaRestResult.isSuccess() ? 0 : 1))
                     .build());
@@ -155,5 +165,15 @@ public class OAService {
         }
     }
 
+    private OARestResult afterException(Exception e) {
+        return OARestResult.builder()
+                .success(false)
+                .errorMsg(
+                        OARestErrorMSg.builder()
+                                .errorDetail(e.getMessage())
+                                .build()
+                )
+                .build();
+    }
 
 }

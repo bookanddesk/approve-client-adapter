@@ -2,9 +2,10 @@ package com.hx.nc.service;
 
 import com.hx.nc.bo.Constant;
 import com.hx.nc.bo.nc.NCTask;
-import com.hx.nc.data.entity.PollingRecord;
+import com.hx.nc.data.entity.NCPollingRecord;
 import com.hx.nc.utils.DateTimeUtils;
 import com.hx.nc.utils.FileUtils;
+import com.hx.nc.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -15,6 +16,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * @author XingJiajun
@@ -41,13 +43,25 @@ public class PollingTask {
     @Scheduled(fixedRate = Constant.LAST_POLL_DURATION)
     public void ncTaskPolling() {
         String lastPollDate = getLastPollDate();
-        List<NCTask> ncTask = ncService.getNCTaskList(lastPollDate);
-        int taskCount = ncTask != null ? ncTask.size() : 0;
-        recordH2Polling(lastPollDate, taskCount);
-        if (taskCount == 0) {
-            return;
+        List<NCTask> ncTask = null;
+        String ncResult = "taskIds[]";
+
+        try {
+            ncTask = ncService.getNCTaskList(lastPollDate);
+        } catch (Exception e) {
+            log.error("getNCTaskList error>> " + e.getMessage());
+            ncResult = e.getMessage();
         }
-        oaService.sendTask(ncTask);
+
+        int taskCount = ncTask != null ? ncTask.size() : 0;
+        if (taskCount > 0) {
+            ncResult = ncTask.stream()
+                    .map(NCTask::getTaskid)
+                    .collect(Collectors.joining(",", "taskIds[", "]"));
+            oaService.sendTask(ncTask);
+        }
+
+        recordH2Polling(lastPollDate, taskCount, ncResult);
     }
 
     public String getLastPollDate() {
@@ -87,10 +101,11 @@ public class PollingTask {
         cacheService.cachePollDate(dateTime);
     }
 
-    private void recordH2Polling(String lastPollDate, int taskCount) {
-        repoService.savePollingRecord(PollingRecord.builder()
+    private void recordH2Polling(String lastPollDate, int taskCount, String ncResult) {
+        repoService.savePollingRecord(NCPollingRecord.builder()
                 .pollAt(lastPollDate)
                 .taskCount(taskCount)
+                .ncResult(StringUtils.substring(ncResult,0, 255))
                 .nextTime(getCachedLastPollDate())
                 .build());
     }

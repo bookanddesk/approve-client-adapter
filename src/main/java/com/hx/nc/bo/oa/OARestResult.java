@@ -1,6 +1,6 @@
 package com.hx.nc.bo.oa;
 
-import lombok.Data;
+import lombok.*;
 
 import java.util.List;
 
@@ -10,7 +10,14 @@ import java.util.List;
  * @Description
  */
 @Data
+@NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
 public class OARestResult {
     private boolean success;
     private List<OARestErrorMSg> errorMsgs;
+
+    @Builder
+    public OARestResult(boolean success, @Singular List<OARestErrorMSg> errorMsgs) {
+        this.success = success;
+        this.errorMsgs = errorMsgs;
+    }
 }
