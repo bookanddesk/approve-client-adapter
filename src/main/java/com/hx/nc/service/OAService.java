@@ -56,7 +56,7 @@ public class OAService {
                             .setPendingList(oaTasks)
                             .build());
         } catch (Exception e) {
-            log.error("sendOATask error>> " + e.getMessage());
+            log.error("sendOATask error>> " + e.getMessage(), e);
             result = afterException(e);
         } finally {
             saveOATaskRecord(StringUtils.substring(

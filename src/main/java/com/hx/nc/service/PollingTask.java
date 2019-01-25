@@ -49,7 +49,7 @@ public class PollingTask {
         try {
             ncTask = ncService.getNCTaskList(lastPollDate);
         } catch (Exception e) {
-            log.error("getNCTaskList error>> " + e.getMessage());
+            log.error("getNCTaskList error>> " + e.getMessage(), e);
             ncResult = e.getMessage();
         }
 

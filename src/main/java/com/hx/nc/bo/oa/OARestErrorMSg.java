@@ -1,9 +1,6 @@
 package com.hx.nc.bo.oa;
 
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /**
  * @author XingJiajun
@@ -12,9 +9,11 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
+@ToString(onlyExplicitlyIncluded = true)
 public class OARestErrorMSg {
     private String errorCode;
     private String errorType;
+    @ToString.Include(name = "err")
     private String errorDetail;
 
     @Builder
