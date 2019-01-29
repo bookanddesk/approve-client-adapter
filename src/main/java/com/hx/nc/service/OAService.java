@@ -70,7 +70,6 @@ public class OAService {
     }
 
     private void countOATasks(OATask oaTask) {
-        oaTask.setNoneBindingReceiver(null);
         meterRegistry.counter(ACA, ACA_METRICS_OA_TASKS, oaTask.getTaskId()).increment();
     }
 
