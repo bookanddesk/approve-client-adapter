@@ -51,6 +51,7 @@ public class PollingTask {
         } catch (Exception e) {
             log.error("getNCTaskList error>> " + e.getMessage(), e);
             ncResult = e.getMessage();
+            recordPollDate(lastPollDate);
         }
 
         int taskCount = ncTask != null ? ncTask.size() : 0;
