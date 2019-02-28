@@ -48,7 +48,8 @@ public class Constant {
     public static final String OA_REST_RESPONSE_ERROR_MSG = "errorMsgs";
 
     public static final String LAST_POLL_DATE_TIME = "lastPollDateTime";
-    public static final long LAST_POLL_DURATION = 2 * 60 * 1_000;//2分钟
+    public static final long LAST_POLL_DURATION_MILLIS = 2 * 60 * 1_000;//2分钟
+    public static final long LAST_POLL_DURATION_MINUTES = 2;//2分钟
 
     public static final String NC_DATA_FIELD_SUFFIX_ITEM_SHOW_NAME = "itemShowName";
     public static final String NC_DATA_FIELD_SUFFIX_ID = "_ID";

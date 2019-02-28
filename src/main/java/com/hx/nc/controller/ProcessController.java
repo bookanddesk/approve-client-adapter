@@ -6,8 +6,13 @@ import com.hx.nc.bo.nc.NCBillDetailParams;
 import com.hx.nc.bo.nc.NCTask;
 import com.hx.nc.bo.nc.NCTaskBaseParams;
 import com.hx.nc.service.NCService;
+import com.hx.nc.service.OAService;
+import com.hx.nc.service.PollingTask;
 import com.hx.nc.service.ProcessService;
+import com.hx.nc.utils.DateTimeUtils;
+import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +20,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author XingJiajun
@@ -31,6 +38,8 @@ public class ProcessController extends BaseController {
     private ProcessService processService;
     @Autowired
     private NCService ncService;
+    @Autowired
+    private PollingTask pollingTask;
 
     /**
      * 查询代办
@@ -103,5 +112,12 @@ public class ProcessController extends BaseController {
         return buildSuccess(processService.queryInstAttachmentList(params));
     }
 
+
+    @GetMapping("/pushTask")
+    public JsonResult pushTask(String[] taskIds, String lastDate) {
+        pollingTask.pushTask(taskIds != null ? Arrays.asList(taskIds) : null,
+                lastDate != null ? lastDate : DateTimeUtils.defaultPollDateTime());
+        return JsonResult.successResult();
+    }
 
 }

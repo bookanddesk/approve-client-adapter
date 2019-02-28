@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -40,7 +41,7 @@ public class PollingTask {
     private RepoService repoService;
 
 
-    @Scheduled(fixedRate = Constant.LAST_POLL_DURATION)
+    @Scheduled(fixedRate = Constant.LAST_POLL_DURATION_MILLIS)
     public void ncTaskPolling() {
         String lastPollDate = getLastPollDate();
         List<NCTask> ncTask = null;
@@ -63,6 +64,22 @@ public class PollingTask {
         }
 
         recordH2Polling(lastPollDate, taskCount, ncResult);
+    }
+
+    public void pushTask(List<String> taskIds, String lastDate) {
+        List<NCTask> ncTaskList = ncService.getNCTaskList(lastDate);
+
+        if (CollectionUtils.isEmpty(ncTaskList)) {
+            return;
+        }
+
+        if (taskIds != null && taskIds.size() > 0) {
+            ncTaskList = ncTaskList.stream()
+                    .filter(x -> taskIds.contains(x.getTaskid()))
+                    .collect(Collectors.toList());
+        }
+
+        oaService.sendTask(ncTaskList);
     }
 
     public String getLastPollDate() {

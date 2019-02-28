@@ -30,7 +30,7 @@ public class DateTimeUtils {
     }
 
     public static String defaultPollDateTime() {
-        return fmtDateTime(LocalDateTime.now().minusMinutes(Constant.LAST_POLL_DURATION));
+        return fmtDateTime(LocalDateTime.now().minusMinutes(Constant.LAST_POLL_DURATION_MINUTES));
     }
     public static String defaultPollingRecordBefore() {
         return fmtDateTime(LocalDateTime.now().minusDays(1));
