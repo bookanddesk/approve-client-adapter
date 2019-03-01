@@ -3,13 +3,13 @@ package com.hx.nc.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.hx.nc.bo.Constant;
-import com.hx.nc.data.bpm.FormFieldResponseEx;
-import com.hx.nc.data.bpm.FormResponseEx;
 import com.hx.nc.bo.nc.NCTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import static com.hx.nc.bo.Constant.*;
 
@@ -50,22 +50,34 @@ public class NCDataProcessService extends AbstractNCDataProcessService {
         return tasks;
     }
 
-    public List<NCTask> resolveNCTaskList(String result) {
-        JsonNode jsonNode = getNCDataNode(result);
-        checkNCData(jsonNode);
-        ArrayNode arrayNode = JsonResultService.getArrayNode(jsonNode, Constant.NC_RESPONSE_PROP_TASK_STRUCT_LIST);
+    List<NCTask> resolveNCTaskList(String result) {
+        ArrayNode arrayNode = resolveTaskNode(result);
         if (arrayNode == null) {
             return null;
         }
         List<NCTask> ncTasks = new ArrayList<>(arrayNode.size());
-        Iterator<JsonNode> iterator = arrayNode.iterator();
-        while (iterator.hasNext()) {
-            JsonNode next = iterator.next();
+        for (JsonNode next : arrayNode) {
             NCTask task = JsonResultService.toObject(next.toString(), NCTask.class);
             task.setMUrl(buildMUrl(task));
             ncTasks.add(task);
         }
         return ncTasks;
+    }
+
+    List<String> resolveNCTaskIdList(String result) {
+        ArrayNode arrayNode = resolveTaskNode(result);
+        if (arrayNode == null) {
+            return null;
+        }
+        return StreamSupport.stream(arrayNode.spliterator(), false)
+                .map(x -> JsonResultService.getValue(x, "taskid"))
+                .collect(Collectors.toList());
+    }
+
+    private ArrayNode resolveTaskNode(String result) {
+        JsonNode jsonNode = getNCDataNode(result);
+        checkNCData(jsonNode);
+        return JsonResultService.getArrayNode(jsonNode, Constant.NC_RESPONSE_PROP_TASK_STRUCT_LIST);
     }
 
     private String buildMUrl(NCTask task) {

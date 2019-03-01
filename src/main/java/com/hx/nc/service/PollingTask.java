@@ -1,5 +1,6 @@
 package com.hx.nc.service;
 
+import com.hx.nc.bo.ACAEnums;
 import com.hx.nc.bo.Constant;
 import com.hx.nc.bo.nc.NCTask;
 import com.hx.nc.data.entity.NCPollingRecord;
@@ -61,6 +62,30 @@ public class PollingTask {
                     .map(NCTask::getTaskid)
                     .collect(Collectors.joining(",", "taskIds[", "]"));
             oaService.sendTask(ncTask);
+        }
+
+        recordH2Polling(lastPollDate, taskCount, ncResult);
+    }
+
+    @Scheduled(initialDelay = Constant.POLL_DELAY_MINUTES, fixedRate = Constant.LAST_POLL_DURATION_MILLIS)
+    public void ncDoneTaskPolling() {
+        String lastPollDate = getLastPollDate();
+        List<String> ncTaskIds = null;
+        String ncResult = "taskIds[]";
+
+        try {
+            ncTaskIds = ncService.getNCDoneTaskList(lastPollDate);
+        } catch (Exception e) {
+            log.error("getNCDoneTaskList error>> " + e.getMessage(), e);
+            ncResult = e.getMessage();
+            recordPollDate(lastPollDate);
+        }
+
+        int taskCount = ncTaskIds != null ? ncTaskIds.size() : 0;
+        if (taskCount > 0) {
+            ncResult = ncTaskIds.stream()
+                    .collect(Collectors.joining(",", "taskIds[", "]"));
+            oaService.updateTask(ncTaskIds, ACAEnums.action.agree);
         }
 
         recordH2Polling(lastPollDate, taskCount, ncResult);

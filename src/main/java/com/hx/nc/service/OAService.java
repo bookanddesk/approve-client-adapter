@@ -14,13 +14,16 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.hx.nc.bo.Constant.*;
 
@@ -41,6 +44,8 @@ public class OAService {
     private MeterRegistry meterRegistry;
     @Autowired
     private RepoService repoService;
+    @Autowired
+    private ThreadPoolTaskExecutor applicationTaskExecutor;
 
 
     public void sendTask(List<NCTask> list) {
@@ -77,13 +82,7 @@ public class OAService {
     public void updateTask(String taskId, ACAEnums.action action) {
         OARestResult result = null;
         try {
-            result = callOARest(buildOATaskUpdateRequestUrl(),
-                    OATaskBaseParams.newBuilder()
-                            .setRegisterCode(properties.getRegisterCode())
-                            .setTaskId(taskId)
-                            .setState(action.taskNextState())
-                            .setSubState(action.taskNextSubState())
-                            .build());
+            result = doOATaskUpdateRequest(taskId, action);
         } catch (Exception e) {
             log.error("updateOATask error>> " + e.getMessage());
             result = afterException(e);
@@ -91,6 +90,23 @@ public class OAService {
             saveOATaskRecord("taskId[" + taskId + "],action[" + action.getValue() + "]",
                     OARestRecord.Type.updateTask, result);
         }
+    }
+
+    public void updateTask(List<String> taskIds, ACAEnums.action action) {
+        Stream<CompletableFuture<Void>> completableFutureStream = taskIds.stream()
+                .map(x -> CompletableFuture.runAsync(() -> doOATaskUpdateRequest(x, action), applicationTaskExecutor));
+        CompletableFuture.allOf(completableFutureStream.toArray(CompletableFuture[]::new)).join();
+    }
+
+    private OARestResult doOATaskUpdateRequest(String taskId, ACAEnums.action action) {
+        log.info(Thread.currentThread().getName() + "---updateTask--" + taskId + "---" + action);
+        return callOARest(buildOATaskUpdateRequestUrl(),
+                OATaskBaseParams.newBuilder()
+                        .setRegisterCode(properties.getRegisterCode())
+                        .setTaskId(taskId)
+                        .setState(action.taskNextState())
+                        .setSubState(action.taskNextSubState())
+                        .build());
     }
 
     private String buildOATaskRequestUrl() {

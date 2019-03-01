@@ -26,6 +26,7 @@ public class Constant {
     public static final String NC_PARAM_GROUP_ID = "groupid";
     public static final String NC_PARAM_LAST_DATE = "lastDate";
     public static final String NC_PARAM_TASK_ID = "taskId";
+    public static final String NC_PARAM_DONE_TASK_QUERY_PARAM = "statuscode=handled";
     public static final String NC_PARAM_BILL_ID = "billId";
     public static final String NC_PARAM_PK_BILL_TYPE = "pk_billtype";
     public static final String NC_PARAM_BILL_TYPE = "billtype";
@@ -50,6 +51,7 @@ public class Constant {
     public static final String LAST_POLL_DATE_TIME = "lastPollDateTime";
     public static final long LAST_POLL_DURATION_MILLIS = 2 * 60 * 1_000;//2分钟
     public static final long LAST_POLL_DURATION_MINUTES = 2;//2分钟
+    public static final long POLL_DELAY_MINUTES = 60 * 1_000;//1分钟
 
     public static final String NC_DATA_FIELD_SUFFIX_ITEM_SHOW_NAME = "itemShowName";
     public static final String NC_DATA_FIELD_SUFFIX_ID = "_ID";

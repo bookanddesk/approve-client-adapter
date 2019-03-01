@@ -1,5 +1,6 @@
 package com.hx.nc.service;
 
+import com.hx.nc.bo.Constant;
 import com.hx.nc.bo.nc.NCTask;
 import com.hx.nc.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,13 @@ public class NCService {
     public List<NCTask> getNCTaskList(String lastDate) {
         return ncDataProcessService.resolveNCTaskList(
                 rest.postForObject(buildNCTaskRequestUrl(lastDate),
+                        null,
+                        String.class));
+    }
+
+    public List<String> getNCDoneTaskList(String lastDate) {
+        return ncDataProcessService.resolveNCTaskIdList(
+                rest.postForObject(buildNCDoneTaskRequestUrl(lastDate),
                         null,
                         String.class));
     }
@@ -83,6 +91,10 @@ public class NCService {
                 .append("&")
                 .append(NC_PARAM_LAST_DATE).append("=").append(lastDate)
                 .toString();
+    }
+
+    private String buildNCDoneTaskRequestUrl(String lastDate) {
+        return buildNCTaskRequestUrl(lastDate) + Constant.NC_PARAM_DONE_TASK_QUERY_PARAM;
     }
 
     private String buildNCBillDetailRequestUrl(String userId, String groupId,
