@@ -12,16 +12,27 @@ import org.springframework.stereotype.Component;
 @Component
 public class CacheService {
 
-    private static final LocalCache<String, String> pollTimeCache = new LocalCache<>();
+    private static final LocalCache<String, String> taskPollTimeCache = new LocalCache<>();
+    private static final LocalCache<String, String> doneTaskPollTimeCache = new LocalCache<>();
 //    private static final LocalCache<String, String> ncOAUserIDCache = new LocalCache<>();
 
-    public String getLastPollDate() {
-        return pollTimeCache.get(Constant.LAST_POLL_DATE_TIME);
+    String getLastPollDate() {
+        return taskPollTimeCache.get(Constant.LAST_POLL_DATE_TIME);
     }
 
-    public void cachePollDate(String date) {
+    void cachePollDate(String date) {
         if (date != null)
-            pollTimeCache.put(Constant.LAST_POLL_DATE_TIME, date);
+            taskPollTimeCache.put(Constant.LAST_POLL_DATE_TIME, date);
+    }
+
+    String getDoneTaskPollDate() {
+        return doneTaskPollTimeCache.get(Constant.LAST_POLL_DATE_TIME);
+    }
+
+    void cacheDoneTaskPollDate(String date) {
+        if (date != null) {
+            doneTaskPollTimeCache.put(Constant.LAST_POLL_DATE_TIME, date);
+        }
     }
 
 //    public String getOAUserIdByNCId(String ncUserId) {

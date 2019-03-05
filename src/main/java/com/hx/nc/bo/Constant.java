@@ -19,7 +19,7 @@ public class Constant {
     public static final String NC_SERVLET_BILL_DETAIL = "/servlet/ncTaskBill";
     public static final String NC_SERVLET_APPROVE_DETAIL = "/servlet/ncApproveDetail";
     public static final String NC_SERVLET_ACTION = "/servlet/ncExeAction";
-    public static final String NC_SERVLET_ATTACH_LIST = "/servlet/ncExeAction";
+    public static final String NC_SERVLET_ATTACH_LIST = "/servlet/ncAttachList";
     public static final String NC_SERVLET_ASSIGN_USER_LIST = "/servlet/ncAssignUserList";
 
     public static final String NC_PARAM_USER_ID = "userid";
@@ -51,7 +51,8 @@ public class Constant {
     public static final String LAST_POLL_DATE_TIME = "lastPollDateTime";
     public static final long LAST_POLL_DURATION_MILLIS = 2 * 60 * 1_000;//2分钟
     public static final long LAST_POLL_DURATION_MINUTES = 2;//2分钟
-    public static final long POLL_DELAY_MINUTES = 60 * 1_000;//1分钟
+    public static final long POLL_DELAY_ONE_MINUTES = 60 * 1_000;//1分钟
+    public static final long POLL_DELAY_TWO_MINUTES = 2 * 60 * 1_000;//2分钟
 
     public static final String NC_DATA_FIELD_SUFFIX_ITEM_SHOW_NAME = "itemShowName";
     public static final String NC_DATA_FIELD_SUFFIX_ID = "_ID";

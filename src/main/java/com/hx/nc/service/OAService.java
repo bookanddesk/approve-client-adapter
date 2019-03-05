@@ -92,14 +92,18 @@ public class OAService {
         }
     }
 
-    public void updateTask(List<String> taskIds, ACAEnums.action action) {
+    void updateTask(List<String> taskIds) {
         Stream<CompletableFuture<Void>> completableFutureStream = taskIds.stream()
-                .map(x -> CompletableFuture.runAsync(() -> doOATaskUpdateRequest(x, action), applicationTaskExecutor));
-        CompletableFuture.allOf(completableFutureStream.toArray(CompletableFuture[]::new)).join();
+                .map(x -> CompletableFuture.runAsync(() ->
+                                doOATaskUpdateRequest(x, ACAEnums.action.agree),
+                        applicationTaskExecutor));
+        CompletableFuture.allOf(completableFutureStream.toArray(CompletableFuture[]::new))
+                .join();
     }
 
     private OARestResult doOATaskUpdateRequest(String taskId, ACAEnums.action action) {
-        log.info(Thread.currentThread().getName() + "---updateTask--" + taskId + "---" + action);
+        log.info(Thread.currentThread().getName() + "---updateTask--" + taskId
+                + "---" + action);
         return callOARest(buildOATaskUpdateRequestUrl(),
                 OATaskBaseParams.newBuilder()
                         .setRegisterCode(properties.getRegisterCode())
@@ -110,21 +114,18 @@ public class OAService {
     }
 
     private String buildOATaskRequestUrl() {
-        return new StringBuilder(properties.getOaIP())
-                .append(OA_REST_URI_RECEIVE_PENDING)
-                .toString();
+        return properties.getOaIP() +
+                OA_REST_URI_RECEIVE_PENDING;
     }
 
     private String buildOATaskUpdateRequestUrl() {
-        return new StringBuilder(properties.getOaIP())
-                .append(OA_REST_URI_UPDATE_PENDING)
-                .toString();
+        return properties.getOaIP() +
+                OA_REST_URI_UPDATE_PENDING;
     }
 
     private String buildOATokenRequestUrl() {
-        return new StringBuilder(properties.getOaIP())
-                .append(OA_REST_URI_TOKEN)
-                .toString();
+        return properties.getOaIP() +
+                OA_REST_URI_TOKEN;
     }
 
     private <T> OARestResult callOARest(String url, T t) {
@@ -167,17 +168,13 @@ public class OAService {
 
     private void saveOATaskRecord(String params, OARestRecord.Type type,
                                   OARestResult oaRestResult) {
-        try {
-            repoService.saveOARestRecord(OARestRecord.builder()
-                    .params(StringUtils.substring(params, 0, 255))
-                    .type(type)
-                    .result(StringUtils.substring(oaRestResult.getErrorMsgs()
-                            .toString(), 0, 255)
-                    )
-                    .success((short) (oaRestResult.isSuccess() ? 0 : 1))
-                    .build());
-        } finally {
-        }
+        repoService.saveOARestRecord(OARestRecord.builder()
+                .params(StringUtils.substring(params, 0, 255))
+                .type(type)
+                .result(StringUtils.substring(oaRestResult.getErrorMsgs()
+                        .toString(), 0, 255))
+                .success((short) (oaRestResult.isSuccess() ? 0 : 1))
+                .build());
     }
 
     private OARestResult afterException(Exception e) {
@@ -186,8 +183,7 @@ public class OAService {
                 .errorMsg(
                         OARestErrorMSg.builder()
                                 .errorDetail(e.getMessage())
-                                .build()
-                )
+                                .build())
                 .build();
     }
 

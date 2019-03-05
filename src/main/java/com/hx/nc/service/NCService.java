@@ -94,7 +94,7 @@ public class NCService {
     }
 
     private String buildNCDoneTaskRequestUrl(String lastDate) {
-        return buildNCTaskRequestUrl(lastDate) + Constant.NC_PARAM_DONE_TASK_QUERY_PARAM;
+        return buildNCTaskRequestUrl(lastDate) + "&" + Constant.NC_PARAM_DONE_TASK_QUERY_PARAM;
     }
 
     private String buildNCBillDetailRequestUrl(String userId, String groupId,

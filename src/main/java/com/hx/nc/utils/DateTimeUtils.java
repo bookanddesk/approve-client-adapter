@@ -15,7 +15,7 @@ public class DateTimeUtils {
     /**
      * 日期格式：yyyy-MM-dd HH:mm:ss
      */
-    public static final String FMT_DATETIME = "yyyy-MM-dd HH:mm:ss";
+    private static final String FMT_DATETIME = "yyyy-MM-dd HH:mm:ss";
 
 //    public static Date now() {
 //        return Date.from(Instant.now());

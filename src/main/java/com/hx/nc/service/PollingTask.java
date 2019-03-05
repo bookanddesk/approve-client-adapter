@@ -1,6 +1,5 @@
 package com.hx.nc.service;
 
-import com.hx.nc.bo.ACAEnums;
 import com.hx.nc.bo.Constant;
 import com.hx.nc.bo.nc.NCTask;
 import com.hx.nc.data.entity.NCPollingRecord;
@@ -42,9 +41,10 @@ public class PollingTask {
     private RepoService repoService;
 
 
-    @Scheduled(fixedRate = Constant.LAST_POLL_DURATION_MILLIS)
+    @Scheduled(initialDelay = Constant.POLL_DELAY_ONE_MINUTES, fixedRate = Constant.LAST_POLL_DURATION_MILLIS)
     public void ncTaskPolling() {
         String lastPollDate = getLastPollDate();
+        log.info("pollTaskAt>> " + lastPollDate);
         List<NCTask> ncTask = null;
         String ncResult = "taskIds[]";
 
@@ -67,12 +67,12 @@ public class PollingTask {
         recordH2Polling(lastPollDate, taskCount, ncResult);
     }
 
-    @Scheduled(initialDelay = Constant.POLL_DELAY_MINUTES, fixedRate = Constant.LAST_POLL_DURATION_MILLIS)
+    @Scheduled(initialDelay = Constant.POLL_DELAY_TWO_MINUTES, fixedRate = Constant.LAST_POLL_DURATION_MILLIS)
     public void ncDoneTaskPolling() {
-        String lastPollDate = getLastPollDate();
+        String lastPollDate = getDefaultPollDate();
+        log.info("poll-Done-Task-At>> " + lastPollDate);
         List<String> ncTaskIds = null;
         String ncResult = "taskIds[]";
-
         try {
             ncTaskIds = ncService.getNCDoneTaskList(lastPollDate);
         } catch (Exception e) {
@@ -85,7 +85,7 @@ public class PollingTask {
         if (taskCount > 0) {
             ncResult = ncTaskIds.stream()
                     .collect(Collectors.joining(",", "taskIds[", "]"));
-            oaService.updateTask(ncTaskIds, ACAEnums.action.agree);
+            oaService.updateTask(ncTaskIds);
         }
 
         recordH2Polling(lastPollDate, taskCount, ncResult);
@@ -119,7 +119,6 @@ public class PollingTask {
             }
         }
         recordPollDate(DateTimeUtils.now());
-        log.info("pollTaskAt>> " + lastPollDate);
         return lastPollDate;
     }
 
