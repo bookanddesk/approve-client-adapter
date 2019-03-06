@@ -26,12 +26,12 @@ public class CacheService {
     }
 
     String getDoneTaskPollDate() {
-        return doneTaskPollTimeCache.get(Constant.LAST_POLL_DATE_TIME);
+        return doneTaskPollTimeCache.get(Constant.LAST_DONE_TASK_POLL_DATE_TIME);
     }
 
     void cacheDoneTaskPollDate(String date) {
         if (date != null) {
-            doneTaskPollTimeCache.put(Constant.LAST_POLL_DATE_TIME, date);
+            doneTaskPollTimeCache.put(Constant.LAST_DONE_TASK_POLL_DATE_TIME, date);
         }
     }
 

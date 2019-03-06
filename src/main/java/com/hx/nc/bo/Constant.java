@@ -49,6 +49,7 @@ public class Constant {
     public static final String OA_REST_RESPONSE_ERROR_MSG = "errorMsgs";
 
     public static final String LAST_POLL_DATE_TIME = "lastPollDateTime";
+    public static final String LAST_DONE_TASK_POLL_DATE_TIME = "lastDoneTaskPollDateTime";
     public static final long LAST_POLL_DURATION_MILLIS = 2 * 60 * 1_000;//2分钟
     public static final long LAST_POLL_DURATION_MINUTES = 2;//2分钟
     public static final long POLL_DELAY_ONE_MINUTES = 60 * 1_000;//1分钟

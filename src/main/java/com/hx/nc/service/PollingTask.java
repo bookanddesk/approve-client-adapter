@@ -69,26 +69,21 @@ public class PollingTask {
 
     @Scheduled(initialDelay = Constant.POLL_DELAY_TWO_MINUTES, fixedRate = Constant.LAST_POLL_DURATION_MILLIS)
     public void ncDoneTaskPolling() {
-        String lastPollDate = getDefaultPollDate();
+        String lastPollDate = getLastDoneTaskDate();
         log.info("poll-Done-Task-At>> " + lastPollDate);
         List<String> ncTaskIds = null;
-        String ncResult = "taskIds[]";
         try {
             ncTaskIds = ncService.getNCDoneTaskList(lastPollDate);
         } catch (Exception e) {
             log.error("getNCDoneTaskList error>> " + e.getMessage(), e);
-            ncResult = e.getMessage();
-            recordPollDate(lastPollDate);
+            cacheService.cacheDoneTaskPollDate(lastPollDate);
         }
 
         int taskCount = ncTaskIds != null ? ncTaskIds.size() : 0;
         if (taskCount > 0) {
-            ncResult = ncTaskIds.stream()
-                    .collect(Collectors.joining(",", "taskIds[", "]"));
             oaService.updateTask(ncTaskIds);
         }
 
-        recordH2Polling(lastPollDate, taskCount, ncResult);
     }
 
     public void pushTask(List<String> taskIds, String lastDate) {
@@ -107,7 +102,7 @@ public class PollingTask {
         oaService.sendTask(ncTaskList);
     }
 
-    public String getLastPollDate() {
+    private String getLastPollDate() {
         String lastPollDate = getCachedLastPollDate();
         if (lastPollDate == null) {
             lastPollDate = getH2LastPollDate();
@@ -120,6 +115,18 @@ public class PollingTask {
         }
         recordPollDate(DateTimeUtils.now());
         return lastPollDate;
+    }
+
+    private String getLastDoneTaskDate() {
+        String lastDate = cacheService.getDoneTaskPollDate();
+        if (lastDate == null) {
+            lastDate = getFiledLastPollDate();
+            if (lastDate == null) {
+                lastDate = getDefaultPollDate();
+            }
+        }
+        cacheService.cacheDoneTaskPollDate(DateTimeUtils.now());
+        return lastDate;
     }
 
     private String getCachedLastPollDate() {
