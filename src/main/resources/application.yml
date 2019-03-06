@@ -21,6 +21,9 @@ spring:
       settings.web-allow-others: true
   jpa.hibernate.ddl-auto: update
   http.encoding.force: true
+  task.execution.pool:
+    max-size: 16
+    queue-capacity: 100
 #  data.jpa.repositories.bootstrap-mode: lazy
 
 #actuator
@@ -33,15 +36,15 @@ info.contact.email: xingjiajun88@sina.com
 
 #app
 hx.nc:
-    IP: http://172.17.10.64:8081
-    host: http://114.113.234.244:8095
-    userid: zxyadmin
-    groupid: 0001V610000000000EEN
-    oa-IP: http://101.254.234.187
-    register-code: 3012
-    oa-user: ncrest
-    oa-pwd: a1234567
-    file-path: D:\lpd.json
+  IP: http://172.17.10.64:8081
+  host: http://114.113.234.244:8095
+  userid: zxyadmin
+  groupid: 0001V610000000000EEN
+  oa-IP: http://101.254.234.187
+  register-code: 3012
+  oa-user: ncrest
+  oa-pwd: a1234567
+  file-path: D:\lpd.json
 
 ---
 spring.profiles: hx64
