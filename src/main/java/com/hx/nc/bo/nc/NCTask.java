@@ -14,13 +14,13 @@ public class NCTask implements Serializable {
     private String billId ;
     private String billNo ;
     private String billType ;
-    private String checkManCode ;
-    private String cuserId ;
+    private String checkManCode ;//nc代办人编码，值和oa人员编码相同
+    private String cuserId ;//nc待办人id
     private String date ;
     private String taskid ;
     private String title ;
     private String mUrl;
     private String url;
-    private String senderMan;
-    private String senderName;
+    private String senderMan;//nc任务发送人id
+    private String senderName;//任务发送人姓名
 }

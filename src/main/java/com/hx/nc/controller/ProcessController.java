@@ -1,18 +1,13 @@
 package com.hx.nc.controller;
 
 import com.hx.nc.bo.JsonResult;
-import com.hx.nc.bo.nc.NCActionParams;
-import com.hx.nc.bo.nc.NCBillDetailParams;
-import com.hx.nc.bo.nc.NCTask;
-import com.hx.nc.bo.nc.NCTaskBaseParams;
+import com.hx.nc.bo.nc.*;
 import com.hx.nc.service.NCService;
-import com.hx.nc.service.OAService;
 import com.hx.nc.service.PollingTask;
 import com.hx.nc.service.ProcessService;
 import com.hx.nc.utils.DateTimeUtils;
-import org.apache.commons.lang3.ArrayUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.CollectionUtils;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +17,6 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.validation.Valid;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @author XingJiajun
@@ -118,6 +112,12 @@ public class ProcessController extends BaseController {
         pollingTask.pushTask(taskIds != null ? Arrays.asList(taskIds) : null,
                 lastDate != null ? lastDate : DateTimeUtils.defaultPollDateTime());
         return JsonResult.successResult();
+    }
+
+    @GetMapping("/download")
+    public ResponseEntity<byte[]> download(@Valid NCFileDataParams params, BindingResult bindingResult) {
+        handleValidateError(bindingResult);
+        return processService.download(params);
     }
 
 }

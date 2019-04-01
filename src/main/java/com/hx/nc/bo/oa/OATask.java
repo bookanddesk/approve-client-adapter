@@ -6,6 +6,10 @@ import com.hx.nc.service.NCProperties;
 import com.hx.nc.utils.SpringContextUtils;
 import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author XingJiajun
  * @Date 2018/12/27 20:24
@@ -60,11 +64,47 @@ public class OATask extends OATaskBaseParams {
                 .setSenderName(ncTask.getSenderName())
                 .setThirdReceiverId(ncTask.getCheckManCode())
                 .setNoneBindingReceiver(ncTask.getCheckManCode())
-                .setNoneBindingSender(ncTask.getSenderName())
+//                .setNoneBindingSender(ncTask.getSenderName())
                 .setCreationDate(ncTask.getDate())
                 .setState(ACAEnums.OATaskState.todo.getCode())
                 .setH5url(ncTask.getMUrl())
                 .build();
+    }
+
+    public static List<OATask> fromNCTask(List<NCTask> ncTasks, Map<String, OAUser> oaUserMap) {
+        List<OATask> oaTasks = new ArrayList<>(ncTasks.size());
+        for (NCTask task : ncTasks) {
+            Builder builder = builder()
+                    .setRegisterCode(getOAAppCode())
+                    .setTaskId(task.getTaskid())
+                    .setTitle(task.getTitle())
+                    .setState(ACAEnums.OATaskState.todo.getCode())
+                    .setH5url(task.getMUrl())
+                    .setCreationDate(task.getDate());
+            String ncUserId = task.getCuserId();
+            OAUser oaUser = oaUserMap.get(ncUserId);
+            if (oaUser != null) {
+                builder.setThirdReceiverId(oaUser.getCode())
+                        .setNoneBindingReceiver(oaUser.getCode());
+            } else {
+                builder.setThirdReceiverId(task.getCheckManCode())
+                        .setNoneBindingReceiver(task.getCheckManCode());
+            }
+            String ncSenderManId = task.getSenderMan();
+            oaUser = oaUserMap.get(ncSenderManId);
+            if (oaUser != null) {
+                builder.setThirdSenderId(oaUser.getCode())
+                        .setSenderName(oaUser.getName())
+                        .setNoneBindingSender(oaUser.getCode());
+            } else {
+                builder.setThirdSenderId(ncSenderManId)
+//                        .setNoneBindingSender(ncTask.getSenderName())
+                        .setSenderName(task.getSenderName());
+            }
+            oaTasks.add(builder.build());
+
+        }
+        return oaTasks;
     }
 
     private static String getOAAppCode() {

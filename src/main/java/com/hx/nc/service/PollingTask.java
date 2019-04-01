@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 @Component
-@Profile({"hx64", "prod"})
+//@Profile({"hx64", "prod"})
 public class PollingTask {
 
     @Autowired

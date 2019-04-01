@@ -30,7 +30,7 @@ import java.util.List;
  * @Date 2019/1/3 15:58
  * @Description
  */
-public class Json2ObjectConvertor {
+public class Json2ObjectConvector {
     private static Date parseDate(String datestr) {
         return DateUtil.parseDate(datestr);
     }

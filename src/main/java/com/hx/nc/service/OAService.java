@@ -1,6 +1,10 @@
 package com.hx.nc.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.collect.Lists;
 import com.hx.nc.bo.ACAEnums;
 import com.hx.nc.bo.nc.NCTask;
 import com.hx.nc.bo.oa.*;
@@ -16,12 +20,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -47,12 +54,33 @@ public class OAService {
     @Autowired
     private ThreadPoolTaskExecutor applicationTaskExecutor;
 
+    private LoadingCache<String, String> token = CacheBuilder.newBuilder()
+            .expireAfterWrite(12, TimeUnit.MINUTES)
+            .maximumSize(1)
+            .build(new CacheLoader<String, String>() {
+                @Override
+                public String load(String s) {
+                    return getToken();
+                }
+            });
 
     public void sendTask(List<NCTask> list) {
-        List<OATask> oaTasks = list.stream()
-                .map(OATask::fromNCTask)
-                .peek(this::countOATasks)
-                .collect(Collectors.toList());
+        Map<String, OAUser> oaUser = null;
+        try {
+            oaUser = getOAUser(list);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        List<OATask> oaTasks;
+        if (CollectionUtils.isEmpty(oaUser)) {
+            oaTasks = list.stream()
+                    .map(OATask::fromNCTask)
+                    .peek(this::countOATasks)
+                    .collect(Collectors.toList());
+        } else {
+            oaTasks = OATask.fromNCTask(list, oaUser);
+        }
+
         log.info("sendOATask>> " + JsonResultService.toJson(oaTasks));
         OARestResult result = null;
         try {
@@ -72,6 +100,35 @@ public class OAService {
                     OARestRecord.Type.sendTask,
                     result);
         }
+    }
+
+    private Map<String, OAUser> getOAUser(List<NCTask> ncTasks) {
+        Map<String, OAUser> userMap = null;
+        Set<String> ncUserIds = new HashSet<>();
+        ncTasks.forEach(x -> {
+            ncUserIds.add(x.getCuserId());
+            ncUserIds.add(x.getSenderMan());
+        });
+
+        List<OAUser> oaUsers = repoService.findAllOAUserById(ncUserIds);
+        if (!CollectionUtils.isEmpty(oaUsers)) {
+            userMap = oaUsers.stream()
+                    .peek(x -> ncUserIds.remove(x.getNcId()))
+                    .collect(Collectors.toMap(OAUser::getNcId, Function.identity()));
+        }
+
+        if (!ncUserIds.isEmpty()) {
+            Map<String, OAUser> oaUserInfo = getOAUserInfo(Lists.newArrayList(ncUserIds));
+            if (!CollectionUtils.isEmpty(oaUserInfo)) {
+                repoService.saveOAUserInfo(oaUserInfo.values());
+                if (userMap == null) {
+                    userMap = oaUserInfo;
+                } else {
+                    userMap.putAll(oaUserInfo);
+                }
+            }
+        }
+        return userMap;
     }
 
     private void countOATasks(OATask oaTask) {
@@ -113,6 +170,36 @@ public class OAService {
                         .build());
     }
 
+    public Map<String, OAUser> getOAUserInfo(List<String> ncUserIds) {
+        JsonNode result = getResult(
+                rest.exchange(buildOAUserRequestUrl(),
+                        HttpMethod.POST,
+                        buildHttpEntity(OAUserReqParams.builder().userzj(ncUserIds).build()),
+                        JsonNode.class));
+        if (result != null && result.size() > 0) {
+            return resolveOAUser(result.get(0));
+        }
+        return null;
+    }
+
+    private Map<String, OAUser> resolveOAUser(JsonNode jsonNode) {
+        Map<String, OAUser> userMap = new HashMap<>(jsonNode.size(), 1);
+        Iterator<Map.Entry<String, JsonNode>> fields = jsonNode.fields();
+        while (fields.hasNext()) {
+            Map.Entry<String, JsonNode> next = fields.next();
+            String ncId = next.getKey();
+            JsonNode oaValue = next.getValue();
+            userMap.put(ncId,
+                    OAUser.builder()
+                            .ncId(ncId)
+                            .name(JsonResultService.getValue(oaValue, "name"))
+                            .code(JsonResultService.getValue(oaValue, "code"))
+                            .build());
+        }
+        return userMap;
+    }
+
+
     private String buildOATaskRequestUrl() {
         return properties.getOaIP() +
                 OA_REST_URI_RECEIVE_PENDING;
@@ -128,6 +215,11 @@ public class OAService {
                 OA_REST_URI_TOKEN;
     }
 
+    private String buildOAUserRequestUrl() {
+        return properties.getOaIP() +
+                OA_REST_URI_UPDATE_USER_INFO;
+    }
+
     private <T> OARestResult callOARest(String url, T t) {
         JsonNode result = getResult(rest.exchange(url, HttpMethod.POST, buildHttpEntity(t), JsonNode.class));
         return checkOARestResult(result);
@@ -139,7 +231,7 @@ public class OAService {
 
     private MultiValueMap<String, String> buildHeaders() {
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
-        headers.add(OA_REST_HEADER_TOKEN, getToken());
+        headers.add(OA_REST_HEADER_TOKEN, token.getUnchecked(OA_REST_HEADER_TOKEN));
         return headers;
     }
 

@@ -35,32 +35,32 @@ public class NCService {
                         String.class));
     }
 
-    public List<String> getNCDoneTaskList(String lastDate) {
+    List<String> getNCDoneTaskList(String lastDate) {
         return ncDataProcessService.resolveNCTaskIdList(
                 rest.postForObject(buildNCDoneTaskRequestUrl(lastDate),
                         null,
                         String.class));
     }
 
-    public String getNCBillDetail(String userId, String groupId,
-                                  String taskId, String billId, String billType) {
+    String getNCBillDetail(String userId, String groupId,
+                           String taskId, String billId, String billType) {
         return rest.postForObject(
                 buildNCBillDetailRequestUrl(userId, groupId, taskId, billId, billType, NC_SERVLET_BILL_DETAIL),
                 null,
                 String.class);
     }
 
-    public String getNCApproveDetail(String userId, String groupId,
-                                     String taskId, String billId, String billType) {
+    String getNCApproveDetail(String userId, String groupId,
+                              String taskId, String billId, String billType) {
         return rest.postForObject(
                 buildNCBillDetailRequestUrl(userId, groupId, taskId, billId, billType, NC_SERVLET_APPROVE_DETAIL),
                 null,
                 String.class);
     }
 
-    public String ncAction(String userId, String groupId,
-                           String taskId, String action,
-                           String approveMsg, String cUserIds) {
+    String ncAction(String userId, String groupId,
+                    String taskId, String action,
+                    String approveMsg, String cUserIds) {
         String result = rest.postForObject(
                 buildNCActionRequestUrl(userId, groupId, taskId, action, approveMsg, cUserIds),
                 null,
@@ -68,17 +68,24 @@ public class NCService {
         return result;
     }
 
-    public String ncAssignUserList(String userId, String groupId,
-                                   String taskId, String billId, String action) {
+    String ncAssignUserList(String userId, String groupId,
+                            String taskId, String billId, String action) {
         return rest.postForObject(
                 buildNCAssignUserListRequestUrl(userId, groupId, taskId, billId, action, NC_SERVLET_ASSIGN_USER_LIST),
                 null,
                 String.class);
     }
 
-    public String getAttachList(String userId, String groupId, String taskId) {
+    String getAttachList(String userId, String groupId, String taskId) {
         return rest.postForObject(
                 buildNCAttachRequestUrl(userId, groupId, taskId),
+                null,
+                String.class);
+    }
+
+    String getAttachFileData(String userId, String groupId, String fileId) {
+        return rest.postForObject(
+                buildFileDataRequestUrl(userId, groupId, fileId),
                 null,
                 String.class);
     }
@@ -151,6 +158,16 @@ public class NCService {
                 .append(commonParams(userId, groupId))
                 .append("&")
                 .append(NC_PARAM_TASK_ID).append("=").append(taskId)
+                .toString();
+    }
+
+    private String buildFileDataRequestUrl(String userId, String groupId, String fileId) {
+        return new StringBuilder(ncProperties.getIp())
+                .append(NC_SERVLET_FILE_DATA)
+                .append("?")
+                .append(commonParams(userId, groupId))
+                .append("&")
+                .append(NC_PARAM_FILE_ID).append("=").append(fileId)
                 .toString();
     }
 

@@ -1,13 +1,16 @@
 package com.hx.nc.service;
 
+import com.google.common.base.Charsets;
 import com.hx.nc.bo.ACAEnums;
 import com.hx.nc.bo.Constant;
 import com.hx.nc.bo.nc.NCActionParams;
 import com.hx.nc.bo.nc.NCBillDetailParams;
+import com.hx.nc.bo.nc.NCFileDataParams;
 import com.hx.nc.bo.nc.NCTaskBaseParams;
 import com.hx.nc.data.bpm.Attachment;
 import com.hx.nc.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import yonyou.bpm.rest.response.historic.HistoricProcessInstanceResponse;
 
@@ -16,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import static com.hx.nc.bo.Constant.CONTENT_DISPOSITION_TYPE_FORM_DATA;
 import static com.hx.nc.bo.Constant.NC_RESPONSE_FLAG;
 
 /**
@@ -99,5 +103,16 @@ public class ProcessService extends BaseService {
         return bpmDataConvertService.resolve2BPMAttachments(getAttachment(params));
     }
 
+    public ResponseEntity<byte[]> download(NCFileDataParams params) {
+        String fileData = ncService.getAttachFileData(params.getUserid(), params.getGroupid(), params.getFileId());
+        byte[] bytes = bpmDataConvertService.resolveNCFileData(fileData);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        httpHeaders.setContentType(MediaType.APPLICATION_OCTET_STREAM);
+        httpHeaders.setContentDisposition(
+                ContentDisposition.builder(CONTENT_DISPOSITION_TYPE_FORM_DATA)
+                        .filename(params.getFilename(), Charsets.UTF_8)
+                        .build());
+        return new ResponseEntity<>(bytes, httpHeaders, HttpStatus.CREATED);
+    }
 
 }

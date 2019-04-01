@@ -5,6 +5,7 @@ import com.hx.nc.bo.nc.NCBillDetailParams;
 import com.hx.nc.data.bill.*;
 import com.hx.nc.data.bpm.*;
 import com.hx.nc.data.convert.DateSwap;
+import com.hx.nc.data.convert.FileDataConvector;
 import com.hx.nc.data.wrap.*;
 import com.hx.nc.data.wrap.response.*;
 import com.hx.nc.utils.StringUtils;
@@ -90,6 +91,19 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
             }
         }
         return rList;
+    }
+
+    @Override
+    public byte[] resolveNCFileData(String jsonStr) {
+        NCFileDataResponse fileDataResponse = convertResponse(getNCDataNode(jsonStr), NCFileDataResponse.class);
+        if (fileDataResponse == null) {
+            return null;
+        }
+        String downloaded = fileDataResponse.getDownloaded();
+        if (StringUtils.isBlank(downloaded)) {
+            return null;
+        }
+        return new FileDataConvector().getByteArrayFromBase64String(downloaded);
     }
 
     private HistoricProcessInstanceResponse getHistoricProcessInstanceResponse(NCTaskBillResponse ncTaskBillResponse,
@@ -369,17 +383,6 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
         // TODO 其他环节...
 
         return historicActivityInstanceResponses;
-    }
-
-    private NCApproveHistoryData getNcUserTask(String ncUser, String taskId, List<NCApproveHistoryData> ahlines) {
-        if (ahlines == null || ahlines.size() == 0)
-            return null;
-        for (NCApproveHistoryData ahline : ahlines) {
-            if (ncUser.equals(ahline.getPsnid())
-                    && taskId.equals(ahline.getApprovedid()))
-                return ahline;
-        }
-        return null;
     }
 
     private <T extends NCBaseResponse> T convertResponse(JsonNode jsonNode, Class<T> tClass) {

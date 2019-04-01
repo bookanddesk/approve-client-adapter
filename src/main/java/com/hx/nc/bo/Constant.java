@@ -20,12 +20,14 @@ public class Constant {
     public static final String NC_SERVLET_APPROVE_DETAIL = "/servlet/ncApproveDetail";
     public static final String NC_SERVLET_ACTION = "/servlet/ncExeAction";
     public static final String NC_SERVLET_ATTACH_LIST = "/servlet/ncAttachList";
+    public static final String NC_SERVLET_FILE_DATA = "/servlet/ncAttachFile";
     public static final String NC_SERVLET_ASSIGN_USER_LIST = "/servlet/ncAssignUserList";
 
     public static final String NC_PARAM_USER_ID = "userid";
     public static final String NC_PARAM_GROUP_ID = "groupid";
     public static final String NC_PARAM_LAST_DATE = "lastDate";
     public static final String NC_PARAM_TASK_ID = "taskId";
+    public static final String NC_PARAM_FILE_ID = "fileid";
     public static final String NC_PARAM_DONE_TASK_QUERY_PARAM = "statuscode=handled";
     public static final String NC_PARAM_BILL_ID = "billId";
     public static final String NC_PARAM_PK_BILL_TYPE = "pk_billtype";
@@ -45,6 +47,7 @@ public class Constant {
     public static final String OA_REST_URI_TOKEN = "/seeyon/rest/token/{restusername}/{password}";
     public static final String OA_REST_URI_RECEIVE_PENDING = "/seeyon/rest/thirdpartyPending/receive/pendings";
     public static final String OA_REST_URI_UPDATE_PENDING = "/seeyon/rest/thirdpartyPending/updatePendingState";
+    public static final String OA_REST_URI_UPDATE_USER_INFO = "/seeyon/rest/TestResource/testNewRest";
     public static final String OA_REST_RESPONSE_PROP_SUCCESS = "success";
     public static final String OA_REST_RESPONSE_ERROR_MSG = "errorMsgs";
 
@@ -67,6 +70,9 @@ public class Constant {
 
     public static final String PARAM_PAGE = "page";
     public static final String PARAM_PAGE_SIZE = "size";
+
+    public static final String CONTENT_DISPOSITION_ATTACHMENT = "attachment";
+    public static final String CONTENT_DISPOSITION_TYPE_FORM_DATA = "attachment";
 
 
 }

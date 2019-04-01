@@ -1,6 +1,8 @@
 package com.hx.nc.service;
 
+import com.hx.nc.bo.oa.OAUser;
 import com.hx.nc.data.dao.OARestRepository;
+import com.hx.nc.data.dao.OAUserRepository;
 import com.hx.nc.data.dao.PollingRepository;
 import com.hx.nc.data.entity.OARestRecord;
 import com.hx.nc.data.entity.NCPollingRecord;
@@ -10,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author XingJiajun
@@ -19,13 +22,15 @@ import java.util.List;
 @Service
 public class RepoService {
 
-    private OARestRepository oaRestRepository;
-    private PollingRepository pollingRepository;
+    private final OARestRepository oaRestRepository;
+    private final PollingRepository pollingRepository;
+    private final OAUserRepository oaUserRepository;
 
     @Autowired
-    public RepoService(OARestRepository oaRestRepository, PollingRepository pollingRepository) {
+    public RepoService(OARestRepository oaRestRepository, PollingRepository pollingRepository, OAUserRepository oaUserRepository) {
         this.oaRestRepository = oaRestRepository;
         this.pollingRepository = pollingRepository;
+        this.oaUserRepository = oaUserRepository;
     }
 
     public OARestRecord saveOARestRecord(OARestRecord restRecord) {
@@ -58,6 +63,14 @@ public class RepoService {
 
     public void deleteRedundantPollingRecords(String pollAtBefore) {
         pollingRepository.deleteByPollAtBefore(pollAtBefore);
+    }
+
+    public List<OAUser> findAllOAUserById(Set<String> ids) {
+        return oaUserRepository.findAllById(ids);
+    }
+
+    public void saveOAUserInfo(Iterable<OAUser> oaUsers) {
+        oaUserRepository.saveAll(oaUsers);
     }
 
 }

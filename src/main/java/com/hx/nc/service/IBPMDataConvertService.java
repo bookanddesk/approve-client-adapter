@@ -18,4 +18,6 @@ public interface IBPMDataConvertService {
     List<HistoricTaskInstanceResponse> resolve2BPMHisTasks(String jsonStr, NCBillDetailParams params);
 
     List<Attachment> resolve2BPMAttachments(String jsonStr);
+
+    byte[] resolveNCFileData(String jsonStr);
 }
