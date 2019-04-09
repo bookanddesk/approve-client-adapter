@@ -57,7 +57,7 @@ public class OATask extends OATaskBaseParams {
 
     public static OATask fromNCTask(NCTask ncTask) {
         return builder()
-                .setRegisterCode(getOAAppCode())
+                .setRegisterCode(getOAAppCode(ncTask.getGroupId()))
                 .setTaskId(ncTask.getTaskid())
                 .setTitle(ncTask.getTitle())
                 .setThirdSenderId(ncTask.getSenderMan())
@@ -75,7 +75,7 @@ public class OATask extends OATaskBaseParams {
         List<OATask> oaTasks = new ArrayList<>(ncTasks.size());
         for (NCTask task : ncTasks) {
             Builder builder = builder()
-                    .setRegisterCode(getOAAppCode())
+                    .setRegisterCode(getOAAppCode(task.getGroupId()))
                     .setTaskId(task.getTaskid())
                     .setTitle(task.getTitle())
                     .setState(ACAEnums.OATaskState.todo.getCode())
@@ -107,8 +107,9 @@ public class OATask extends OATaskBaseParams {
         return oaTasks;
     }
 
-    private static String getOAAppCode() {
-       return SpringContextUtils.getBean(NCProperties.class).getRegisterCode();
+    private static String getOAAppCode(String groupId) {
+        NCProperties ncProperties = SpringContextUtils.getBean(NCProperties.class);
+        return groupId == null ? ncProperties.getRegisterCode() : ncProperties.getNcRegisterCode(groupId);
     }
 
     public static Builder builder() {

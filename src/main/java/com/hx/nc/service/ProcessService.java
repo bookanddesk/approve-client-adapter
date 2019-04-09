@@ -30,14 +30,18 @@ import static com.hx.nc.bo.Constant.NC_RESPONSE_FLAG;
 @Service
 public class ProcessService extends BaseService {
 
-    @Autowired
-    private NCService ncService;
-    @Autowired
-    private OAService oaService;
-    @Autowired
-    private BPMDataConvertService bpmDataConvertService;
+    private final NCService ncService;
+    private final OAService oaService;
+    private final BPMDataConvertService bpmDataConvertService;
 
-    public String getNCBillDetailData(NCBillDetailParams params) {
+    @Autowired
+    public ProcessService(NCService ncService, OAService oaService, BPMDataConvertService bpmDataConvertService) {
+        this.ncService = ncService;
+        this.oaService = oaService;
+        this.bpmDataConvertService = bpmDataConvertService;
+    }
+
+    private String getNCBillDetailData(NCBillDetailParams params) {
         return ncService.getNCBillDetail(params.getUserid(), params.getGroupid(),
                 params.getTaskId(), params.getBillId(), params.getBilltype());
     }
@@ -66,7 +70,7 @@ public class ProcessService extends BaseService {
         return result;
     }
 
-    public String getAttachment(NCTaskBaseParams params) {
+    private String getAttachment(NCTaskBaseParams params) {
         return ncService.getAttachList(params.getUserid(), params.getGroupid(),
                 params.getTaskId());
     }

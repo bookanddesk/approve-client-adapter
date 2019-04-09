@@ -43,26 +43,30 @@ import static com.hx.nc.bo.Constant.*;
 @Service
 public class OAService {
 
-    @Autowired
-    private NCProperties properties;
-    @Autowired
-    private RestTemplate rest;
-    @Autowired
-    private MeterRegistry meterRegistry;
-    @Autowired
-    private RepoService repoService;
-    @Autowired
-    private ThreadPoolTaskExecutor applicationTaskExecutor;
+    private final NCProperties properties;
+    private final RestTemplate rest;
+    private final MeterRegistry meterRegistry;
+    private final RepoService repoService;
+    private final ThreadPoolTaskExecutor applicationTaskExecutor;
+    private final LoadingCache<String, String> token;
 
-    private LoadingCache<String, String> token = CacheBuilder.newBuilder()
-            .expireAfterWrite(12, TimeUnit.MINUTES)
-            .maximumSize(1)
-            .build(new CacheLoader<String, String>() {
-                @Override
-                public String load(String s) {
-                    return getToken();
-                }
-            });
+    @Autowired
+    public OAService(NCProperties properties, RestTemplate rest, MeterRegistry meterRegistry, RepoService repoService, ThreadPoolTaskExecutor applicationTaskExecutor) {
+        this.properties = properties;
+        this.rest = rest;
+        this.meterRegistry = meterRegistry;
+        this.repoService = repoService;
+        this.applicationTaskExecutor = applicationTaskExecutor;
+        this.token = CacheBuilder.newBuilder()
+                .expireAfterWrite(12, TimeUnit.MINUTES)
+                .maximumSize(1)
+                .build(new CacheLoader<String, String>() {
+                    @Override
+                    public String load(String s) {
+                        return getToken();
+                    }
+                });
+    }
 
     public void sendTask(List<NCTask> list) {
         Map<String, OAUser> oaUser = null;
@@ -110,22 +114,22 @@ public class OAService {
             ncUserIds.add(x.getSenderMan());
         });
 
-        List<OAUser> oaUsers = repoService.findAllOAUserById(ncUserIds);
-        if (!CollectionUtils.isEmpty(oaUsers)) {
-            userMap = oaUsers.stream()
-                    .peek(x -> ncUserIds.remove(x.getNcId()))
-                    .collect(Collectors.toMap(OAUser::getNcId, Function.identity()));
-        }
+//        List<OAUser> oaUsers = repoService.findAllOAUserById(ncUserIds);
+//        if (!CollectionUtils.isEmpty(oaUsers)) {
+//            userMap = oaUsers.stream()
+//                    .peek(x -> ncUserIds.remove(x.getNcId()))
+//                    .collect(Collectors.toMap(OAUser::getNcId, Function.identity()));
+//        }
 
         if (!ncUserIds.isEmpty()) {
             Map<String, OAUser> oaUserInfo = getOAUserInfo(Lists.newArrayList(ncUserIds));
             if (!CollectionUtils.isEmpty(oaUserInfo)) {
-                repoService.saveOAUserInfo(oaUserInfo.values());
-                if (userMap == null) {
+//                repoService.saveOAUserInfo(oaUserInfo.values());
+//                if (userMap == null) {
                     userMap = oaUserInfo;
-                } else {
-                    userMap.putAll(oaUserInfo);
-                }
+//                } else {
+//                    userMap.putAll(oaUserInfo);
+//                }
             }
         }
         return userMap;

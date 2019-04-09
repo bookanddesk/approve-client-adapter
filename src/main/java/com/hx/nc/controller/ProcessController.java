@@ -9,10 +9,7 @@ import com.hx.nc.utils.DateTimeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Arrays;
@@ -41,8 +38,10 @@ public class ProcessController extends BaseController {
      * @return
      */
     @GetMapping("/listTodo")
-    public JsonResult listTodo(String lastDate) {
-        List<NCTask> ncTaskList = ncService.getNCTaskList(lastDate != null ? lastDate : "2018-12-10");
+    public JsonResult listTodo(String lastDate, String groupId) {
+        List<NCTask> ncTaskList = ncService.getNCTaskList(
+                lastDate != null ? lastDate : "2018-12-10",
+                groupId != null ? groupId : "0001V610000000000EEN");
         return buildSuccess(ncTaskList);
     }
 
@@ -108,9 +107,9 @@ public class ProcessController extends BaseController {
 
 
     @GetMapping("/pushTask")
-    public JsonResult pushTask(String[] taskIds, String lastDate) {
+    public JsonResult pushTask(String[] taskIds, String lastDate, String groupId) {
         pollingTask.pushTask(taskIds != null ? Arrays.asList(taskIds) : null,
-                lastDate != null ? lastDate : DateTimeUtils.defaultPollDateTime());
+                lastDate != null ? lastDate : DateTimeUtils.defaultPollDateTime(), groupId);
         return JsonResult.successResult();
     }
 

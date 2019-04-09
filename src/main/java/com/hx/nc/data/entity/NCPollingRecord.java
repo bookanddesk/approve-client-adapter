@@ -32,13 +32,18 @@ public class NCPollingRecord {
     @NotBlank
     @Column(name = "next_time")
     private String nextTime;
+    @NotBlank
+    @Column(name = "group_id")
+    private String groupId;
 
     @Builder
-    public NCPollingRecord(Long id, @NotBlank String pollAt, @NotBlank String ncResult, Integer taskCount, String nextTime) {
+    public NCPollingRecord(Long id, @NotBlank String pollAt, @NotBlank String ncResult,
+                           Integer taskCount, String nextTime, String groupId) {
         this.id = id;
         this.pollAt = pollAt;
         this.ncResult = ncResult;
         this.taskCount = taskCount;
         this.nextTime = nextTime;
+        this.groupId = groupId;
     }
 }

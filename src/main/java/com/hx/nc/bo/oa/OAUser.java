@@ -14,7 +14,7 @@ import javax.persistence.Id;
  * @Description
  */
 @Data
-@Entity
+//@Entity
 @NoArgsConstructor(force = true)
 public class OAUser {
     @Id

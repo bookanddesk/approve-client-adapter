@@ -27,7 +27,7 @@ public class AbstractNCDataProcessService implements INCDataProcessService{
         }
     }
 
-    protected JsonNode toJson(String string) {
+    JsonNode toJson(String string) {
         Preconditions.checkNotNull(string);
         return JsonResultService.createNode(string);
     }

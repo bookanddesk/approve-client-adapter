@@ -23,4 +23,5 @@ public class NCTask implements Serializable {
     private String url;
     private String senderMan;//nc任务发送人id
     private String senderName;//任务发送人姓名
+    private String groupId;
 }

@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
  * @Date 2019/3/30 13:26
  * @Description
  */
-public interface OAUserRepository extends JpaRepository<OAUser, String> {
-}
+//public interface OAUserRepository extends JpaRepository<OAUser, String> {
+//}

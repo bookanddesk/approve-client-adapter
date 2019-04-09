@@ -15,25 +15,18 @@ import java.util.HashMap;
 public class FileUtils {
 
     public static String getLastPollDateFromJsonFile(String filePath) {
+        String result = null;
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(filePath))) {
-            JsonNode jsonNode = JsonResultService.createNode(bufferedReader.readLine());
-            if (jsonNode != null) {
-                return JsonResultService.getValue(jsonNode, Constant.LAST_POLL_DATE_TIME);
-            }
+            result = bufferedReader.readLine();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        return result;
     }
 
-    public static void recordLastPollDateToJsonFile(String filePath, String lastPollDate) {
-        if (StringUtils.isEmpty(lastPollDate)) {
-            return;
-        }
+    public static void recordLastPollDateToJsonFile(String filePath, String content) {
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(filePath))) {
-            bufferedWriter.write(JsonResultService.toJson(new HashMap() {{
-                put(Constant.LAST_POLL_DATE_TIME, lastPollDate);
-            }}));
+            bufferedWriter.write(content);
         } catch (IOException e) {
             e.printStackTrace();
         }

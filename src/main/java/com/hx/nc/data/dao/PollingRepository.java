@@ -11,8 +11,8 @@ import org.springframework.transaction.annotation.Transactional;
  * @Description
  */
 public interface PollingRepository extends JpaRepository<NCPollingRecord, Long> {
-    @Query(value = "SELECT MAX(NEXT_TIME) FROM POLLING_RECORD", nativeQuery = true)
-    String selectLastPollingTime();
+    @Query(value = "SELECT MAX(NEXT_TIME) FROM POLLING_RECORD where group_id = ?1", nativeQuery = true)
+    String selectLastPollingTime(String groupId);
 
     @Transactional
     int deleteByPollAtBefore(String pollAt);

@@ -21,8 +21,12 @@ import static com.hx.nc.bo.Constant.*;
 @Component
 public class NCDataProcessService extends AbstractNCDataProcessService {
 
+    private final NCProperties properties;
+
     @Autowired
-    private NCProperties properties;
+    public NCDataProcessService(NCProperties properties) {
+        this.properties = properties;
+    }
 
 
     private List toList(String string) {
@@ -50,7 +54,7 @@ public class NCDataProcessService extends AbstractNCDataProcessService {
         return tasks;
     }
 
-    List<NCTask> resolveNCTaskList(String result) {
+    List<NCTask> resolveNCTaskList(String result, String groupId) {
         ArrayNode arrayNode = resolveTaskNode(result);
         if (arrayNode == null) {
             return null;
@@ -58,6 +62,7 @@ public class NCDataProcessService extends AbstractNCDataProcessService {
         List<NCTask> ncTasks = new ArrayList<>(arrayNode.size());
         for (JsonNode next : arrayNode) {
             NCTask task = JsonResultService.toObject(next.toString(), NCTask.class);
+            task.setGroupId(groupId);
             task.setMUrl(buildMUrl(task));
             ncTasks.add(task);
         }
@@ -81,18 +86,17 @@ public class NCDataProcessService extends AbstractNCDataProcessService {
     }
 
     private String buildMUrl(NCTask task) {
-        return new StringBuilder(properties.getHost())
-                .append(NC_DETAIL_URL_MOBILE)
-                .append(NC_PARAM_USER_ID).append("=").append(task.getCuserId())
-                .append("&")
-                .append(NC_PARAM_GROUP_ID).append("=").append(properties.getGroupid())
-                .append("&")
-                .append(NC_PARAM_TASK_ID).append("=").append(task.getTaskid())
-                .append("&")
-                .append(NC_PARAM_BILL_ID).append("=").append(task.getBillId())
-                .append("&")
-                .append(NC_PARAM_PK_BILL_TYPE).append("=").append(task.getBillType())
-                .toString();
+        return properties.getHost() +
+                NC_DETAIL_URL_MOBILE +
+                NC_PARAM_USER_ID + "=" + task.getCuserId() +
+                "&" +
+                NC_PARAM_GROUP_ID + "=" + task.getGroupId() +
+                "&" +
+                NC_PARAM_TASK_ID + "=" + task.getTaskid() +
+                "&" +
+                NC_PARAM_BILL_ID + "=" + task.getBillId() +
+                "&" +
+                NC_PARAM_PK_BILL_TYPE + "=" + task.getBillType();
     }
 
 }

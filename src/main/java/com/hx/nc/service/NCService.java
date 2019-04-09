@@ -20,24 +20,28 @@ import static com.hx.nc.bo.Constant.*;
 @Service
 public class NCService {
 
-    @Autowired
-    private NCProperties ncProperties;
-    @Autowired
-    private NCDataProcessService ncDataProcessService;
-    @Autowired
-    private RestTemplate rest;
+    private final NCProperties ncProperties;
+    private final NCDataProcessService ncDataProcessService;
+    private final RestTemplate rest;
 
-
-    public List<NCTask> getNCTaskList(String lastDate) {
-        return ncDataProcessService.resolveNCTaskList(
-                rest.postForObject(buildNCTaskRequestUrl(lastDate),
-                        null,
-                        String.class));
+    @Autowired
+    public NCService(NCProperties ncProperties, NCDataProcessService ncDataProcessService, RestTemplate rest) {
+        this.ncProperties = ncProperties;
+        this.ncDataProcessService = ncDataProcessService;
+        this.rest = rest;
     }
 
-    List<String> getNCDoneTaskList(String lastDate) {
+
+    public List<NCTask> getNCTaskList(String lastDate, String groupId) {
+        return ncDataProcessService.resolveNCTaskList(
+                rest.postForObject(buildNCTaskRequestUrl(lastDate, groupId),
+                        null,
+                        String.class), groupId);
+    }
+
+    public List<String> getNCDoneTaskList(String lastDate, String groupId) {
         return ncDataProcessService.resolveNCTaskIdList(
-                rest.postForObject(buildNCDoneTaskRequestUrl(lastDate),
+                rest.postForObject(buildNCDoneTaskRequestUrl(lastDate, groupId),
                         null,
                         String.class));
     }
@@ -61,11 +65,10 @@ public class NCService {
     String ncAction(String userId, String groupId,
                     String taskId, String action,
                     String approveMsg, String cUserIds) {
-        String result = rest.postForObject(
+        return rest.postForObject(
                 buildNCActionRequestUrl(userId, groupId, taskId, action, approveMsg, cUserIds),
                 null,
                 String.class);
-        return result;
     }
 
     String ncAssignUserList(String userId, String groupId,
@@ -90,46 +93,43 @@ public class NCService {
                 String.class);
     }
 
-    private String buildNCTaskRequestUrl(String lastDate) {
-        return new StringBuilder(ncProperties.getIp())
-                .append(NC_SERVLET_TASK)
-                .append("?")
-                .append(commonParams())
-                .append("&")
-                .append(NC_PARAM_LAST_DATE).append("=").append(lastDate)
-                .toString();
+    private String buildNCTaskRequestUrl(String lastDate, String groupId) {
+        return ncIp(groupId) +
+                NC_SERVLET_TASK +
+                "?" +
+                commonParams(null, groupId) +
+                "&" +
+                NC_PARAM_LAST_DATE + "=" + lastDate;
     }
 
-    private String buildNCDoneTaskRequestUrl(String lastDate) {
-        return buildNCTaskRequestUrl(lastDate) + "&" + Constant.NC_PARAM_DONE_TASK_QUERY_PARAM;
+    private String buildNCDoneTaskRequestUrl(String lastDate, String groupId) {
+        return buildNCTaskRequestUrl(lastDate, groupId) + "&" + Constant.NC_PARAM_DONE_TASK_QUERY_PARAM;
     }
 
     private String buildNCBillDetailRequestUrl(String userId, String groupId,
                                                String taskId, String billId, String billType,
                                                String servlet) {
-        return new StringBuilder(ncProperties.getIp())
-                .append(servlet)
-                .append("?")
-                .append(commonParams(userId, groupId, taskId))
-                .append("&")
-                .append(NC_PARAM_BILL_ID).append("=").append(billId)
-                .append("&")
-                .append(NC_PARAM_PK_BILL_TYPE).append("=").append(billType)
-                .toString();
+        return ncIp(groupId) +
+                servlet +
+                "?" +
+                commonParams(userId, groupId, taskId) +
+                "&" +
+                NC_PARAM_BILL_ID + "=" + billId +
+                "&" +
+                NC_PARAM_PK_BILL_TYPE + "=" + billType;
     }
 
     private String buildNCAssignUserListRequestUrl(String userId, String groupId,
                                                    String taskId, String billId, String action,
                                                    String servlet) {
-        return new StringBuilder(ncProperties.getIp())
-                .append(servlet)
-                .append("?")
-                .append(commonParams(userId, groupId, taskId))
-                .append("&")
-                .append(NC_PARAM_BILL_ID).append("=").append(billId)
-                .append("&")
-                .append(NC_PARAM_ACTION).append("=").append(action)
-                .toString();
+        return ncIp(groupId) +
+                servlet +
+                "?" +
+                commonParams(userId, groupId, taskId) +
+                "&" +
+                NC_PARAM_BILL_ID + "=" + billId +
+                "&" +
+                NC_PARAM_ACTION + "=" + action;
     }
 
     private String buildNCActionRequestUrl(String userId, String groupId,
@@ -152,43 +152,39 @@ public class NCService {
     }
 
     private String buildNCAttachRequestUrl(String userId, String groupId, String taskId) {
-        return new StringBuilder(ncProperties.getIp())
-                .append(NC_SERVLET_ATTACH_LIST)
-                .append("?")
-                .append(commonParams(userId, groupId))
-                .append("&")
-                .append(NC_PARAM_TASK_ID).append("=").append(taskId)
-                .toString();
+        return ncIp(groupId) +
+                NC_SERVLET_ATTACH_LIST +
+                "?" +
+                commonParams(userId, groupId) +
+                "&" +
+                NC_PARAM_TASK_ID + "=" + taskId;
     }
 
     private String buildFileDataRequestUrl(String userId, String groupId, String fileId) {
-        return new StringBuilder(ncProperties.getIp())
-                .append(NC_SERVLET_FILE_DATA)
-                .append("?")
-                .append(commonParams(userId, groupId))
-                .append("&")
-                .append(NC_PARAM_FILE_ID).append("=").append(fileId)
-                .toString();
-    }
-
-    private String commonParams() {
-        return commonParams(null, null);
+        return ncIp(groupId) +
+                NC_SERVLET_FILE_DATA +
+                "?" +
+                commonParams(userId, groupId) +
+                "&" +
+                NC_PARAM_FILE_ID + "=" + fileId;
     }
 
     private String commonParams(String userId, String groupId) {
-        return new StringBuilder()
-                .append(NC_PARAM_USER_ID).append("=")
-                .append(Optional.ofNullable(userId).orElse(ncProperties.getUserid()))
-                .append("&")
-                .append(NC_PARAM_GROUP_ID).append("=")
-                .append(Optional.ofNullable(groupId).orElse(ncProperties.getGroupid()))
-                .toString();
+        return NC_PARAM_USER_ID + "=" +
+                Optional.ofNullable(userId).orElse(ncProperties.getUserid()) +
+                "&" +
+                NC_PARAM_GROUP_ID + "=" +
+                Optional.ofNullable(groupId).orElse(ncProperties.getGroupid());
     }
 
     private String commonParams(String userId, String groupId, String taskId) {
-        return new StringBuilder(commonParams(userId, groupId))
-                .append("&")
-                .append(NC_PARAM_TASK_ID).append("=").append(taskId)
-                .toString();
+        return commonParams(userId, groupId) +
+                "&" +
+                NC_PARAM_TASK_ID + "=" + taskId;
     }
+    
+    private String ncIp(String groupId) {
+        return ncProperties.getNcIp(groupId);
+    }
+        
 }

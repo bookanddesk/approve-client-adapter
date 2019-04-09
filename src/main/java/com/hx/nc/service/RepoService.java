@@ -1,18 +1,15 @@
 package com.hx.nc.service;
 
-import com.hx.nc.bo.oa.OAUser;
 import com.hx.nc.data.dao.OARestRepository;
-import com.hx.nc.data.dao.OAUserRepository;
 import com.hx.nc.data.dao.PollingRepository;
-import com.hx.nc.data.entity.OARestRecord;
 import com.hx.nc.data.entity.NCPollingRecord;
+import com.hx.nc.data.entity.OARestRecord;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Set;
 
 /**
  * @author XingJiajun
@@ -24,13 +21,13 @@ public class RepoService {
 
     private final OARestRepository oaRestRepository;
     private final PollingRepository pollingRepository;
-    private final OAUserRepository oaUserRepository;
+//    private final OAUserRepository oaUserRepository;
 
     @Autowired
-    public RepoService(OARestRepository oaRestRepository, PollingRepository pollingRepository, OAUserRepository oaUserRepository) {
+    public RepoService(OARestRepository oaRestRepository, PollingRepository pollingRepository) {
         this.oaRestRepository = oaRestRepository;
         this.pollingRepository = pollingRepository;
-        this.oaUserRepository = oaUserRepository;
+//        this.oaUserRepository = oaUserRepository;
     }
 
     public OARestRecord saveOARestRecord(OARestRecord restRecord) {
@@ -57,20 +54,20 @@ public class RepoService {
         return pollingRepository.findAll(pageable);
     }
 
-    public String getLastPollingRecord() {
-        return pollingRepository.selectLastPollingTime();
+    public String getLastPollingRecord(String groupId) {
+        return pollingRepository.selectLastPollingTime(groupId);
     }
 
     public void deleteRedundantPollingRecords(String pollAtBefore) {
         pollingRepository.deleteByPollAtBefore(pollAtBefore);
     }
 
-    public List<OAUser> findAllOAUserById(Set<String> ids) {
-        return oaUserRepository.findAllById(ids);
-    }
-
-    public void saveOAUserInfo(Iterable<OAUser> oaUsers) {
-        oaUserRepository.saveAll(oaUsers);
-    }
+//    public List<OAUser> findAllOAUserById(Set<String> ids) {
+//        return oaUserRepository.findAllById(ids);
+//    }
+//
+//    public void saveOAUserInfo(Iterable<OAUser> oaUsers) {
+//        oaUserRepository.saveAll(oaUsers);
+//    }
 
 }
