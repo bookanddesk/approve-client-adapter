@@ -1,7 +1,7 @@
 package com.hx.nc.utils;
 
 import com.google.common.base.Joiner;
-import com.hx.nc.bo.Constant;
+import com.hx.nc.bo.Constants;
 
 import java.util.Optional;
 
@@ -17,7 +17,7 @@ public class StringUtils extends org.apache.commons.lang3.StringUtils {
     }
 
     public static <E> String join_ (E... els) {
-        return Joiner.on(Constant.UNDERLINE).skipNulls().join(els);
+        return Joiner.on(Constants.UNDERLINE).skipNulls().join(els);
     }
 
 

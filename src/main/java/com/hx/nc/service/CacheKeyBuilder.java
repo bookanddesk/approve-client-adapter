@@ -1,7 +1,7 @@
 package com.hx.nc.service;
 
 import com.hx.nc.bo.ACAEnums;
-import com.hx.nc.bo.Constant;
+import com.hx.nc.bo.Constants;
 import com.hx.nc.utils.StringUtils;
 
 /**
@@ -12,7 +12,7 @@ import com.hx.nc.utils.StringUtils;
 abstract class CacheKeyBuilder {
 
     private String buildCacheKey(String groupId, ACAEnums.OATaskState taskState) {
-        return StringUtils.join_(Constant.LAST_POLL_DATE_TIME, taskState.name(), groupId);
+        return StringUtils.join_(Constants.LAST_POLL_DATE_TIME, taskState.name(), groupId);
     }
 
     String todoPollTimeKey(String groupId) {

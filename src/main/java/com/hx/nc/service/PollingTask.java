@@ -1,7 +1,6 @@
 package com.hx.nc.service;
 
-import com.hx.nc.bo.ACAEnums.OATaskState;
-import com.hx.nc.bo.Constant;
+import com.hx.nc.bo.Constants;
 import com.hx.nc.bo.nc.NCTask;
 import com.hx.nc.data.entity.NCPollingRecord;
 import com.hx.nc.utils.DateTimeUtils;
@@ -42,7 +41,7 @@ public class PollingTask extends CacheKeyBuilder{
     }
 
 
-    @Scheduled(initialDelay = Constant.POLL_DELAY_ONE_MINUTES, fixedRate = Constant.LAST_POLL_DURATION_MILLIS)
+    @Scheduled(initialDelay = Constants.POLL_DELAY_ONE_MINUTES, fixedRate = Constants.LAST_POLL_DURATION_MILLIS)
     public void ncTaskPolling() {
         properties.getNc65Properties().keySet().forEach(
                 x -> ncTaskPolling(
@@ -72,7 +71,7 @@ public class PollingTask extends CacheKeyBuilder{
         recordH2Polling(lastPollDate, taskCount, ncResult, groupId);
     }
 
-    @Scheduled(initialDelay = Constant.POLL_DELAY_TWO_MINUTES, fixedRate = Constant.LAST_POLL_DURATION_MILLIS)
+    @Scheduled(initialDelay = Constants.POLL_DELAY_TWO_MINUTES, fixedRate = Constants.LAST_POLL_DURATION_MILLIS)
     public void ncDoneTaskPolling() {
         properties.getNc65Properties().keySet().forEach(
                 x -> ncDoneTaskPolling(

@@ -20,6 +20,7 @@
                         <thead>
                         <th class="text-center">ID</th>
                         <th class="text-center">时间</th>
+                        <th class="text-center">groupId</th>
                         <th class="text-center">数量</th>
                         <th class="text-center">结果</th>
                         <th class="text-center">下次时间</th>
@@ -28,6 +29,7 @@
                         <tr th:each="o : ${pollingRecords.content}">
                             <td th:text="${o.id}">ID</td>
                             <td th:text="${o.pollAt}">时间</td>
+                            <td th:text="${o.groupId}">groupId</td>
                             <td th:text="${o.taskCount}">任务数</td>
                             <td th:text="${o.ncResult}">nc返回结果</td>
                             <td th:text="${o.nextTime}">下次轮询</td>

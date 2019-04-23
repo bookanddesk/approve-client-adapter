@@ -1,7 +1,7 @@
 package com.hx.nc.data.name;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.hx.nc.bo.Constant;
+import com.hx.nc.bo.Constants;
 
 import java.util.Iterator;
 
@@ -15,14 +15,14 @@ public class BillItemNameRule implements INameRule {
     public String getName(JsonNode node, String name) {
         String result = null;
         switch (name) {
-            case Constant.NC_DATA_FIELD_SHOW_NAME:
+            case Constants.NC_DATA_FIELD_SHOW_NAME:
                 result = getBaseName(node, false);
                 break;
-            case Constant.NC_DATA_FIELD_SHOW_VALUE:
+            case Constants.NC_DATA_FIELD_SHOW_VALUE:
                 result = getBaseName(node, true);
                 break;
-            case Constant.NC_DATA_FIELD_SHOW_VALUE_ID:
-                result = getBaseName(node, true) + Constant.NC_DATA_FIELD_SUFFIX_ID;
+            case Constants.NC_DATA_FIELD_SHOW_VALUE_ID:
+                result = getBaseName(node, true) + Constants.NC_DATA_FIELD_SUFFIX_ID;
         }
         return result;
     }
@@ -32,9 +32,9 @@ public class BillItemNameRule implements INameRule {
         Iterator<String> fieldNames = node.fieldNames();
         while (fieldNames.hasNext()) {
             String fieldName = fieldNames.next();
-            if (fieldName.endsWith(Constant.NC_DATA_FIELD_SUFFIX_ITEM_SHOW_NAME)) {
+            if (fieldName.endsWith(Constants.NC_DATA_FIELD_SUFFIX_ITEM_SHOW_NAME)) {
                 return
-                        sub ? fieldName.substring(0, fieldName.length() - Constant.NC_DATA_FIELD_SUFFIX_ITEM_SHOW_NAME_LENGTH) :
+                        sub ? fieldName.substring(0, fieldName.length() - Constants.NC_DATA_FIELD_SUFFIX_ITEM_SHOW_NAME_LENGTH) :
                                 fieldName;
             }
         }

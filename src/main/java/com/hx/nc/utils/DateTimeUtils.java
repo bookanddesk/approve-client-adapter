@@ -1,6 +1,6 @@
 package com.hx.nc.utils;
 
-import com.hx.nc.bo.Constant;
+import com.hx.nc.bo.Constants;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -30,7 +30,7 @@ public class DateTimeUtils {
     }
 
     public static String defaultPollDateTime() {
-        return fmtDateTime(LocalDateTime.now().minusMinutes(Constant.LAST_POLL_DURATION_MINUTES));
+        return fmtDateTime(LocalDateTime.now().minusMinutes(Constants.LAST_POLL_DURATION_MINUTES));
     }
     public static String defaultPollingRecordBefore() {
         return fmtDateTime(LocalDateTime.now().minusDays(1));

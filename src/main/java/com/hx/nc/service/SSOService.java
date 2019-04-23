@@ -1,10 +1,9 @@
 package com.hx.nc.service;
 
-import com.hx.nc.bo.Constant;
 import com.hx.nc.utils.StringUtils;
 import org.springframework.stereotype.Service;
 
-import static com.hx.nc.bo.Constant.*;
+import static com.hx.nc.bo.Constants.*;
 
 /**
  * @author XingJiajun

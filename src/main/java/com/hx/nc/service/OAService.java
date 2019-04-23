@@ -28,11 +28,10 @@ import org.springframework.web.client.RestTemplate;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.hx.nc.bo.Constant.*;
+import static com.hx.nc.bo.Constants.*;
 
 /**
  * @author XingJiajun

@@ -5,7 +5,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.collect.Maps;
-import com.hx.nc.bo.Constant;
+import com.hx.nc.bo.Constants;
 import com.hx.nc.utils.DateTimeUtils;
 import com.hx.nc.utils.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,8 +69,8 @@ public class PollTimeService extends CacheKeyBuilder {
     }
 
     private String getH2LastPollDate(String key) {
-        if (key.contains(Constant.UNDERLINE)) {
-            key = key.split(Constant.UNDERLINE)[2];
+        if (key.contains(Constants.UNDERLINE)) {
+            key = key.split(Constants.UNDERLINE)[2];
         }
         return repoService.getLastPollingRecord(key);
     }
@@ -118,7 +118,7 @@ public class PollTimeService extends CacheKeyBuilder {
     }
 
 
-    private class LocalCache {
+    private static class LocalCache {
 
         private final Cache<String, String> stringCache;
 

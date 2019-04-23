@@ -2,7 +2,7 @@ package com.hx.nc.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.hx.nc.bo.Constant;
+import com.hx.nc.bo.Constants;
 import com.hx.nc.bo.nc.NCTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -11,7 +11,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-import static com.hx.nc.bo.Constant.*;
+import static com.hx.nc.bo.Constants.*;
 
 /**
  * @author XingJiajun
@@ -43,13 +43,13 @@ public class NCDataProcessService extends AbstractNCDataProcessService {
             throw new RuntimeException();
         }
         Map<String, Object> dataMap = list.get(0);
-        if (!Constant.ZERO_STRING_VALUE.equals(dataMap.get(Constant.NC_RESPONSE_FLAG))) {
+        if (!Constants.ZERO_STRING_VALUE.equals(dataMap.get(Constants.NC_RESPONSE_FLAG))) {
             throw new RuntimeException(
-                    Optional.ofNullable(dataMap.get(Constant.NC_RESPONSE_DES).toString())
+                    Optional.ofNullable(dataMap.get(Constants.NC_RESPONSE_DES).toString())
                             .orElse(""));
         }
         List<Map<String, Object>> tasks =
-                (List<Map<String, Object>>) dataMap.get(Constant.NC_RESPONSE_PROP_TASK_STRUCT_LIST);
+                (List<Map<String, Object>>) dataMap.get(Constants.NC_RESPONSE_PROP_TASK_STRUCT_LIST);
 
         return tasks;
     }
@@ -82,7 +82,7 @@ public class NCDataProcessService extends AbstractNCDataProcessService {
     private ArrayNode resolveTaskNode(String result) {
         JsonNode jsonNode = getNCDataNode(result);
         checkNCData(jsonNode);
-        return JsonResultService.getArrayNode(jsonNode, Constant.NC_RESPONSE_PROP_TASK_STRUCT_LIST);
+        return JsonResultService.getArrayNode(jsonNode, Constants.NC_RESPONSE_PROP_TASK_STRUCT_LIST);
     }
 
     private String buildMUrl(NCTask task) {

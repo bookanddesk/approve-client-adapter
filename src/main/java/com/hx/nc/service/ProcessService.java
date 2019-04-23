@@ -2,7 +2,7 @@ package com.hx.nc.service;
 
 import com.google.common.base.Charsets;
 import com.hx.nc.bo.ACAEnums;
-import com.hx.nc.bo.Constant;
+import com.hx.nc.bo.Constants;
 import com.hx.nc.bo.nc.NCActionParams;
 import com.hx.nc.bo.nc.NCBillDetailParams;
 import com.hx.nc.bo.nc.NCFileDataParams;
@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static com.hx.nc.bo.Constant.CONTENT_DISPOSITION_TYPE_FORM_DATA;
-import static com.hx.nc.bo.Constant.NC_RESPONSE_FLAG;
+import static com.hx.nc.bo.Constants.CONTENT_DISPOSITION_TYPE_FORM_DATA;
+import static com.hx.nc.bo.Constants.NC_RESPONSE_FLAG;
 
 /**
  * @author XingJiajun
@@ -77,7 +77,7 @@ public class ProcessService extends BaseService {
 
     private boolean actionSuccess(String result) {
         if (StringUtils.isNotEmpty(result)) {
-            return Constant.ZERO_STRING_VALUE.equals(
+            return Constants.ZERO_STRING_VALUE.equals(
                     JsonResultService.getValue(
                             JsonResultService.createNode(result).get(0), NC_RESPONSE_FLAG));
         }

@@ -1,6 +1,6 @@
 package com.hx.nc.service;
 
-import com.hx.nc.bo.Constant;
+import com.hx.nc.bo.Constants;
 import com.hx.nc.bo.nc.NCTask;
 import com.hx.nc.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.List;
 import java.util.Optional;
 
-import static com.hx.nc.bo.Constant.*;
+import static com.hx.nc.bo.Constants.*;
 
 /**
  * @author XingJiajun
@@ -103,7 +103,7 @@ public class NCService {
     }
 
     private String buildNCDoneTaskRequestUrl(String lastDate, String groupId) {
-        return buildNCTaskRequestUrl(lastDate, groupId) + "&" + Constant.NC_PARAM_DONE_TASK_QUERY_PARAM;
+        return buildNCTaskRequestUrl(lastDate, groupId) + "&" + Constants.NC_PARAM_DONE_TASK_QUERY_PARAM;
     }
 
     private String buildNCBillDetailRequestUrl(String userId, String groupId,

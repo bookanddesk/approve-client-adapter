@@ -1,6 +1,6 @@
 package com.hx.nc.controller;
 
-import com.hx.nc.bo.Constant;
+import com.hx.nc.bo.Constants;
 import com.hx.nc.bo.JsonResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
@@ -27,13 +27,13 @@ public abstract class BaseController {
         return getMsg(request, msgKey, null);
     }
 
-    protected String getMsg(HttpServletRequest request, String msgKey, Object[] objects) {
+    private String getMsg(HttpServletRequest request, String msgKey, Object[] objects) {
         RequestContext requestContext = new RequestContext(request);
         String message = requestContext.getMessage(msgKey, objects);
         return message != null ? message : msgKey;
     }
 
-    protected void handleValidateError(BindingResult bindingResult) {
+    void handleValidateError(BindingResult bindingResult) {
         if (bindingResult != null && bindingResult.hasErrors()) {
             throw new IllegalArgumentException(bindingResult.getAllErrors().stream()
                     .map(DefaultMessageSourceResolvable::getDefaultMessage)
@@ -45,7 +45,7 @@ public abstract class BaseController {
         return JsonResult.successResult();
     }
 
-    protected <T> JsonResult buildSuccess(T t) {
+    <T> JsonResult buildSuccess(T t) {
         return JsonResult.successResult(t);
     }
 
@@ -58,25 +58,25 @@ public abstract class BaseController {
     }
 
 
-    protected String getParameter(String param) {
+    private String getParameter(String param) {
         return request.getParameter(param);
     }
 
-    protected PageRequest getPageRequest(String... sort) {
+    PageRequest getPageRequest(String... sort) {
         if (sort != null) {
             return PageRequest.of(getPageNOParam(), getPageSizeParam(), Sort.by(sort).descending());
         }
         return PageRequest.of(getPageNOParam(), getPageSizeParam());
     }
 
-    protected int getPageNOParam() {
-        return Optional.ofNullable(getParameter(Constant.PARAM_PAGE))
+    private int getPageNOParam() {
+        return Optional.ofNullable(getParameter(Constants.PARAM_PAGE))
                 .map(Integer::parseInt)
                 .orElse(0);
     }
 
-    protected int getPageSizeParam() {
-        return Optional.ofNullable(getParameter(Constant.PARAM_PAGE_SIZE))
+    private int getPageSizeParam() {
+        return Optional.ofNullable(getParameter(Constants.PARAM_PAGE_SIZE))
                 .map(Integer::parseInt)
                 .orElse(10);
     }

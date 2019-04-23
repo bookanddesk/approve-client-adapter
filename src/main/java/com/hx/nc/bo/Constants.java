@@ -5,7 +5,11 @@ package com.hx.nc.bo;
  * @Date 2018/12/12 14:59
  * @Description
  */
-public class Constant {
+public class Constants {
+
+    private Constants() {
+    }
+
     public static final String ACA = "aca";
 
     public static final String UNDERLINE = "_";

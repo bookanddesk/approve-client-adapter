@@ -1,11 +1,6 @@
 package com.hx.nc.utils;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.hx.nc.bo.Constant;
-import com.hx.nc.service.JsonResultService;
-
 import java.io.*;
-import java.util.HashMap;
 
 /**
  * @author XingJiajun

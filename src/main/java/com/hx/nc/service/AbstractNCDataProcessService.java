@@ -2,7 +2,7 @@ package com.hx.nc.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.base.Preconditions;
-import com.hx.nc.bo.Constant;
+import com.hx.nc.bo.Constants;
 
 import java.util.Optional;
 
@@ -19,10 +19,10 @@ public class AbstractNCDataProcessService implements INCDataProcessService{
 
     @Override
     public void checkNCData(JsonNode jsonNode) {
-        if (!Constant.ZERO_STRING_VALUE.equals(
-                JsonResultService.getValue(jsonNode, Constant.NC_RESPONSE_FLAG))) {
+        if (!Constants.ZERO_STRING_VALUE.equals(
+                JsonResultService.getValue(jsonNode, Constants.NC_RESPONSE_FLAG))) {
             throw new RuntimeException(
-                    Optional.ofNullable(JsonResultService.getValue(jsonNode, Constant.NC_RESPONSE_DES))
+                    Optional.ofNullable(JsonResultService.getValue(jsonNode, Constants.NC_RESPONSE_DES))
                             .orElse("NC Data Result error!"));
         }
     }
