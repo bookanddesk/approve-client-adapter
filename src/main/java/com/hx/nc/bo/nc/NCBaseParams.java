@@ -11,7 +11,8 @@ import java.io.Serializable;
  * @Description
  */
 @Data
-public abstract class NCBaseParams implements Serializable {
+abstract class NCBaseParams implements Serializable {
+    private static final long serialVersionUID = -3811145631837878794L;
     @NotBlank(message = "userid参数不能为空！")
     private String userid;
     @NotBlank(message = "groupid参数不能为空！")

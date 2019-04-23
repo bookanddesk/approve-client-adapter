@@ -1,6 +1,7 @@
 package com.hx.nc.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.collect.Lists;
 import com.hx.nc.bo.nc.NCBillDetailParams;
 import com.hx.nc.data.bill.*;
 import com.hx.nc.data.bpm.*;
@@ -54,7 +55,7 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
         return resolveHistoricTasks(ncApproveDetailResponse, null);
     }
 
-    public void packHistoricProcessInstanceResponseWithNCApproveDetail(
+    void packHistoricProcessInstanceResponseWithNCApproveDetail(
             String jsonStr,
             HistoricProcessInstanceResponse historicProcessInstanceResponse) {
         NCApproveDetailResponse ncApproveDetailResponse = convertResponse(getNCDataNode(jsonStr), NCApproveDetailResponse.class);
@@ -70,27 +71,69 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
         if (ncAttachmentResponse == null) {
             return null;
         }
-        List<NCAttachData> ncAttachDataList = ncAttachmentResponse.getDataResult();
-        if (ncAttachDataList == null || ncAttachDataList.size() == 0) {
+        List<NCAttachGroupData> ncAttachGroupDataList = ncAttachmentResponse.getDataResult();
+        if (ncAttachGroupDataList == null || ncAttachGroupDataList.size() == 0) {
             return null;
         }
+
         List<Attachment> rList = new ArrayList<>();
-        Attachment attachment;
-        for (NCAttachData attachNCData : ncAttachDataList) {
-            attachment = new Attachment();
-            rList.add(attachment);
-            attachment.setId(attachNCData.getFileid());
-            attachment.setName(attachNCData.getFilename());
-            attachment.setAuthor("NC附件");
-            int extIndex = attachNCData.getFilename().lastIndexOf(".");
-            if (extIndex != -1) {
-                attachment.setType(attachNCData.getFilename().substring(
-                        extIndex + 1));
-            } else {
-                attachment.setType("unknown");
-            }
+        for (NCAttachGroupData attachGroup : ncAttachGroupDataList) {
+            List<NCAttachData> ncAttachDataList = attachGroup.getAttachmentgrouplist();
+            if (ncAttachDataList == null || ncAttachDataList.size() == 0)
+                continue;
+            for (NCAttachData attachNCData : ncAttachDataList)
+                rList.add(fromNCAttachData(attachNCData));
         }
         return rList;
+    }
+
+    @Override
+    public List<Attachment> resolveAttachFromApproveDetail(String jsonStr) {
+        NCApproveDetailResponse ncApproveDetailResponse = convertResponse(getNCDataNode(jsonStr), NCApproveDetailResponse.class);
+        if (ncApproveDetailResponse == null) {
+            return Collections.emptyList();
+        }
+
+        NCApproveHistoryDataAdapter approveHistoryDataAdapter = getApproveHistoryDataAdapter(ncApproveDetailResponse);
+        if (approveHistoryDataAdapter == null) {
+            return Collections.emptyList();
+        }
+
+        List<NCApproveHistoryData> approvehistorylinelist = approveHistoryDataAdapter.getApprovehistorylinelist();
+        if (approvehistorylinelist == null || approvehistorylinelist.size() == 0) {
+            return Collections.emptyList();
+        }
+
+        Set<NCAttachData> ncAttachData = new HashSet<>();
+        for (NCApproveHistoryData historyData : approvehistorylinelist) {
+            List<NCAttachGroupData> attachGroupDataList = historyData.getAttachstructlist();
+            if (attachGroupDataList == null || attachGroupDataList.size() == 0)
+                continue;
+            NCAttachGroupData attachGroupData = attachGroupDataList.get(0);
+            List<NCAttachData> attachList = attachGroupData.getAttachmentgrouplist();
+            if (attachList == null || attachList.size() == 0)
+                continue;
+            ncAttachData.addAll(attachList);
+        }
+
+        return ncAttachData.stream()
+                .map(this::fromNCAttachData)
+                .collect(Collectors.toList());
+    }
+
+    private Attachment fromNCAttachData(NCAttachData attachNCData) {
+        Attachment attachment = new Attachment();
+        attachment.setId(attachNCData.getFileid());
+        attachment.setName(attachNCData.getFilename());
+        attachment.setAuthor("NC附件");
+        int extIndex = attachNCData.getFilename().lastIndexOf(".");
+        if (extIndex != -1) {
+            attachment.setType(attachNCData.getFilename().substring(
+                    extIndex + 1));
+        } else {
+            attachment.setType("unknown");
+        }
+        return attachment;
     }
 
     @Override
@@ -306,12 +349,10 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
 
     private List<HistoricTaskInstanceResponse> resolveHistoricTasks(NCApproveDetailResponse approveDetailResponse,
                                                                     HistoricProcessInstanceResponse historicProcessInstanceResponse) {
-        List<NCApproveHistoryDataAdapter> approvehistorylinelist = approveDetailResponse.getApprovehistorylinelist();
-        if (approvehistorylinelist == null || approvehistorylinelist.size() == 0) {
+        NCApproveHistoryDataAdapter ncApproveHistoryDataAdapter = getApproveHistoryDataAdapter(approveDetailResponse);
+        if (ncApproveHistoryDataAdapter == null) {
             return null;
         }
-
-        NCApproveHistoryDataAdapter ncApproveHistoryDataAdapter = approvehistorylinelist.get(0);
         List<NCApproveHistoryData> approveHisList = ncApproveHistoryDataAdapter.getApprovehistorylinelist();
         if (approveHisList == null || approveHisList.size() == 0) {
             return null;
@@ -337,6 +378,14 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
         }
 
         return historicTaskInstanceResponses;
+    }
+
+    private NCApproveHistoryDataAdapter getApproveHistoryDataAdapter(NCApproveDetailResponse approveDetailResponse) {
+        List<NCApproveHistoryDataAdapter> approvehistorylinelist = approveDetailResponse.getApprovehistorylinelist();
+        if (approvehistorylinelist == null || approvehistorylinelist.size() == 0) {
+            return null;
+        }
+        return approvehistorylinelist.get(0);
     }
 
     private HistoricTaskInstanceResponse buildHistoricTask(NCApproveHistoryData ncApproveHistoryData) {

@@ -2,6 +2,7 @@ package com.hx.nc.service;
 
 import com.google.common.base.Charsets;
 import com.hx.nc.bo.ACAEnums;
+import com.hx.nc.bo.ApplyData;
 import com.hx.nc.bo.Constants;
 import com.hx.nc.bo.nc.NCActionParams;
 import com.hx.nc.bo.nc.NCBillDetailParams;
@@ -84,7 +85,7 @@ public class ProcessService extends BaseService {
         return false;
     }
 
-    public Map<String, Object> getApply(NCBillDetailParams params) {
+    public ApplyData getApply(NCBillDetailParams params) {
         HistoricProcessInstanceResponse instResp =
                 bpmDataConvertService.resolve2BpmApproveDetail(getNCBillDetailData(params), params);
 
@@ -95,16 +96,17 @@ public class ProcessService extends BaseService {
 //        instResp.setHistoricTasks(
 //                bpmDataConvertService.resolve2BPMHisTasks(getNCApproveDetailData(params), params));
 
-        return new HashMap(){{
-            put("inst", instResp);
-            put("copyToEndTime", null);
-            put("currentUserId", params.getUserid());
-            put("nodeFormID", null);
-        }};
+        return ApplyData.builder()
+                .inst(instResp)
+                .currentUserId(params.getUserid())
+                .build();
     }
 
     public List<Attachment> queryInstAttachmentList(NCTaskBaseParams params) {
-        return bpmDataConvertService.resolve2BPMAttachments(getAttachment(params));
+        return bpmDataConvertService.resolveAttachFromApproveDetail(
+                ncService.getNCApproveDetail(params.getUserid(), params.getGroupid(),
+                        params.getTaskId(), null, null)
+        );
     }
 
     public ResponseEntity<byte[]> download(NCFileDataParams params) {

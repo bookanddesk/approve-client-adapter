@@ -10,6 +10,7 @@ import java.io.Serializable;
  * @Description
  */
 @Data
-public abstract class OABaseParam implements Serializable {
+abstract class OABaseParam implements Serializable {
+    private static final long serialVersionUID = -7858183524585401449L;
     private String registerCode;//系统注册编码
 }

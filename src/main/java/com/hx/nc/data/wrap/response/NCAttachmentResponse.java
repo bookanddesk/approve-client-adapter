@@ -2,6 +2,7 @@ package com.hx.nc.data.wrap.response;
 
 import com.hx.nc.data.annotation.Element;
 import com.hx.nc.data.wrap.NCAttachData;
+import com.hx.nc.data.wrap.NCAttachGroupData;
 import lombok.Data;
 
 import java.util.List;
@@ -14,5 +15,5 @@ import java.util.List;
 @Data
 public class NCAttachmentResponse extends NCBaseResponse{
     @Element(name = "attachstructlist", type = Element.ElementType.List)
-    private List<NCAttachData> dataResult;
+    private List<NCAttachGroupData> dataResult;
 }

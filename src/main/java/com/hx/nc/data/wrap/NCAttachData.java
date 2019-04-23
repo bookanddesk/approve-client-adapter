@@ -1,6 +1,7 @@
 package com.hx.nc.data.wrap;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 /**
  * @author XingJiajun
@@ -8,7 +9,9 @@ import lombok.Data;
  * @Description
  */
 @Data
+@EqualsAndHashCode(callSuper = false, onlyExplicitlyIncluded = true)
 public class NCAttachData extends PojoMapSupport {
+    @EqualsAndHashCode.Include
     private String fileid;
     private String filename;
     private String filesize;

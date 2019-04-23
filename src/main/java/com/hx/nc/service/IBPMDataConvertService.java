@@ -19,5 +19,7 @@ public interface IBPMDataConvertService {
 
     List<Attachment> resolve2BPMAttachments(String jsonStr);
 
+    List<Attachment> resolveAttachFromApproveDetail(String jsonStr);
+
     byte[] resolveNCFileData(String jsonStr);
 }

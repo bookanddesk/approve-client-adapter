@@ -22,5 +22,5 @@ public class NCApproveHistoryData extends PojoMapSupport{
     private String handlername;
     private String mark;
     @Element(name = "attachstructlist", type = Element.ElementType.List)
-    private List<NCAttachData> attachstructlist;
+    private List<NCAttachGroupData> attachstructlist;
 }
