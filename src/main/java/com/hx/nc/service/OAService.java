@@ -173,7 +173,7 @@ public class OAService {
                         .build());
     }
 
-    public Map<String, OAUser> getOAUserInfo(List<String> ncUserIds) {
+    private Map<String, OAUser> getOAUserInfo(List<String> ncUserIds) {
         JsonNode result = getResult(
                 rest.exchange(buildOAUserRequestUrl(),
                         HttpMethod.POST,
