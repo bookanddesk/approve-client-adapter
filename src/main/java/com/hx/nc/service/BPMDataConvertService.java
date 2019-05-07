@@ -1,7 +1,6 @@
 package com.hx.nc.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.collect.Lists;
 import com.hx.nc.bo.nc.NCBillDetailParams;
 import com.hx.nc.data.bill.*;
 import com.hx.nc.data.bpm.*;
@@ -10,6 +9,7 @@ import com.hx.nc.data.convert.FileDataConvector;
 import com.hx.nc.data.wrap.*;
 import com.hx.nc.data.wrap.response.*;
 import com.hx.nc.utils.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import yonyou.bpm.rest.ex.util.DateUtil;
 import yonyou.bpm.rest.response.CommentResponse;
@@ -29,6 +29,14 @@ import java.util.stream.Collectors;
  */
 @Service
 public class BPMDataConvertService extends AbstractNCDataProcessService implements IBPMDataConvertService {
+
+    private final NCProperties ncProperties;
+
+    @Autowired
+    public BPMDataConvertService(NCProperties ncProperties) {
+        this.ncProperties = ncProperties;
+    }
+
 
     @Override
     public JsonNode getNCDataNode(String jsonStr) {
@@ -63,6 +71,21 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
             return;
         }
         resolveHistoricTasks(ncApproveDetailResponse, historicProcessInstanceResponse);
+    }
+
+    void packHistoricProcessInstanceResponseWithNCApproveDetail(
+            String groupId, String jsonStr,
+            HistoricProcessInstanceResponse historicProcessInstanceResponse) {
+        if (ncProperties.getGroupid().equals(groupId)) {
+            packHistoricProcessInstanceResponseWithNCApproveDetail(jsonStr, historicProcessInstanceResponse);
+            return;
+        }
+
+        NC65ApproveDetailResponse nc65ApproveDetailResponse = convertResponse(getNCDataNode(jsonStr), NC65ApproveDetailResponse.class);
+        if (nc65ApproveDetailResponse == null) {
+            return;
+        }
+        resolveHistoricTasks(nc65ApproveDetailResponse, historicProcessInstanceResponse);
     }
 
     @Override
@@ -364,7 +387,9 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
 
         if (historicProcessInstanceResponse != null) {
             historicProcessInstanceResponse.setHistoricTasks(historicTaskInstanceResponses);
-            historicProcessInstanceResponse.setHistoricActivityInstances(resolveHistoricActivities(approveDetailResponse));
+            historicProcessInstanceResponse.setHistoricActivityInstances(
+                    resolveHistoricActivities(
+                            approveDetailResponse.getMakername(), approveDetailResponse.getSubmitdate()));
             List<NCFlowHistoryData> flowHistoryDataList = ncApproveHistoryDataAdapter.getFlowhistory();
             if (flowHistoryDataList != null && flowHistoryDataList.size() > 0) {
                 flowHistoryDataList.stream()
@@ -374,6 +399,46 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
                             historicProcessInstanceResponse.setDeleteReason("end");
                             historicProcessInstanceResponse.setEndTime(x.getTime());
                         });
+            }
+        }
+
+        return historicTaskInstanceResponses;
+    }
+
+    private List<HistoricTaskInstanceResponse> resolveHistoricTasks(NC65ApproveDetailResponse approveDetailResponse,
+                                                                    HistoricProcessInstanceResponse historicProcessInstanceResponse) {
+        List<NCApproveHistoryData> approveHisList = approveDetailResponse.getApprovehistorylinelist();
+        if (approveHisList == null || approveHisList.size() == 0) {
+            return null;
+        }
+
+        List<HistoricTaskInstanceResponse> historicTaskInstanceResponses = approveHisList.stream()
+                .map(this::buildHistoricTask)
+                .collect(Collectors.toList());
+
+        if (historicProcessInstanceResponse != null) {
+            historicProcessInstanceResponse.setHistoricTasks(historicTaskInstanceResponses);
+            List<NCFlowHistoryData> flowHistoryDataList = approveDetailResponse.getFlowhistory();
+            if (flowHistoryDataList != null && flowHistoryDataList.size() > 0) {
+                flowHistoryDataList.stream()
+                        .filter(x -> "final".equalsIgnoreCase(x.getUnittype()))
+                        .findAny()
+                        .ifPresent(x -> {
+                            historicProcessInstanceResponse.setDeleteReason("end");
+                            historicProcessInstanceResponse.setEndTime(x.getTime());
+                        });
+                Map<String, List<NCFlowHistoryData>> collect = flowHistoryDataList.stream()
+                        .collect(Collectors.groupingBy(NCFlowHistoryData::getUnittype));
+                if (collect.containsKey("final")) {
+                    historicProcessInstanceResponse.setDeleteReason("end");
+                    historicProcessInstanceResponse.setEndTime(collect.get("final").get(0).getTime());
+                }
+                if (collect.containsKey("submit")) {
+                    NCFlowHistoryData submit = collect.get("submit").get(0);
+                    historicProcessInstanceResponse.setHistoricActivityInstances(
+                            resolveHistoricActivities(
+                                    submit.getPersonlist().get(0).getName(), submit.getTime()));
+                }
             }
         }
 
@@ -414,18 +479,15 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
     }
 
     private List<HistoricActivityInstanceResponse> resolveHistoricActivities(
-            NCApproveDetailResponse ncApprovedDetail) {
+            String userName, Date submitDate) {
         List<HistoricActivityInstanceResponse> historicActivityInstanceResponses = new ArrayList<>(1);
         // 制单环节
         HistoricActivityInstanceResponseEx historicActivityInstanceResponseEx = new HistoricActivityInstanceResponseEx();
         historicActivityInstanceResponseEx.setActivityType("startEvent");
         historicActivityInstanceResponseEx.setActivityName("制单");
-        historicActivityInstanceResponseEx.setUserName(ncApprovedDetail
-                .getMakername());
-        historicActivityInstanceResponseEx.setAssignee(ncApprovedDetail
-                .getMakername());
-        historicActivityInstanceResponseEx.setEndTime(new DateSwap(
-                ncApprovedDetail.getSubmitdate()));
+        historicActivityInstanceResponseEx.setUserName(userName);
+        historicActivityInstanceResponseEx.setAssignee(userName);
+        historicActivityInstanceResponseEx.setEndTime(new DateSwap(submitDate));
         historicActivityInstanceResponses
                 .add(historicActivityInstanceResponseEx);
 
