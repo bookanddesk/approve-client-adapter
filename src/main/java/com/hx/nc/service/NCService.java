@@ -39,7 +39,7 @@ public class NCService {
                         String.class), groupId);
     }
 
-    public List<String> getNCDoneTaskList(String lastDate, String groupId) {
+    List<String> getNCDoneTaskList(String lastDate, String groupId) {
         return ncDataProcessService.resolveNCTaskIdList(
                 rest.postForObject(buildNCDoneTaskRequestUrl(lastDate, groupId),
                         null,
@@ -74,7 +74,7 @@ public class NCService {
     String ncAssignUserList(String userId, String groupId,
                             String taskId, String billId, String action) {
         return rest.postForObject(
-                buildNCAssignUserListRequestUrl(userId, groupId, taskId, billId, action, NC_SERVLET_ASSIGN_USER_LIST),
+                buildNCAssignUserListRequestUrl(userId, groupId, taskId, billId, action),
                 null,
                 String.class);
     }
@@ -120,10 +120,9 @@ public class NCService {
     }
 
     private String buildNCAssignUserListRequestUrl(String userId, String groupId,
-                                                   String taskId, String billId, String action,
-                                                   String servlet) {
+                                                   String taskId, String billId, String action) {
         return ncIp(groupId) +
-                servlet +
+                Constants.NC_SERVLET_ASSIGN_USER_LIST +
                 "?" +
                 commonParams(userId, groupId, taskId) +
                 "&" +
@@ -135,7 +134,7 @@ public class NCService {
     private String buildNCActionRequestUrl(String userId, String groupId,
                                            String taskId, String action,
                                            String approveMsg, String cUserIds) {
-        StringBuilder append = new StringBuilder(ncProperties.getIp())
+        StringBuilder append = new StringBuilder(ncIp(groupId))
                 .append(NC_SERVLET_ACTION)
                 .append("?")
                 .append(commonParams(userId, groupId, taskId))
