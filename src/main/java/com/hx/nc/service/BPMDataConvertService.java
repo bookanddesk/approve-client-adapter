@@ -76,7 +76,7 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
     void packHistoricProcessInstanceResponseWithNCApproveDetail(
             String groupId, String jsonStr,
             HistoricProcessInstanceResponse historicProcessInstanceResponse) {
-        if (ncProperties.getGroupid().equals(groupId)) {
+        if (isNC63(groupId)) {
             packHistoricProcessInstanceResponseWithNCApproveDetail(jsonStr, historicProcessInstanceResponse);
             return;
         }
@@ -122,7 +122,23 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
             return Collections.emptyList();
         }
 
-        List<NCApproveHistoryData> approvehistorylinelist = approveHistoryDataAdapter.getApprovehistorylinelist();
+        return resolveAttachFormHistoryList(approveHistoryDataAdapter.getApprovehistorylinelist());
+    }
+
+    public List<Attachment> resolveAttachFromApproveDetail(String groupId, String jsonStr) {
+        if (isNC63(groupId))
+            return resolveAttachFromApproveDetail(jsonStr);
+
+        NC65ApproveDetailResponse nc65ApproveDetailResponse = convertResponse(getNCDataNode(jsonStr), NC65ApproveDetailResponse.class);
+        if (nc65ApproveDetailResponse == null) {
+            return Collections.emptyList();
+        }
+
+        return resolveAttachFormHistoryList(nc65ApproveDetailResponse.getApprovehistorylinelist());
+
+    }
+
+    private List<Attachment> resolveAttachFormHistoryList(List<NCApproveHistoryData> approvehistorylinelist) {
         if (approvehistorylinelist == null || approvehistorylinelist.size() == 0) {
             return Collections.emptyList();
         }
@@ -499,5 +515,10 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
     private <T extends NCBaseResponse> T convertResponse(JsonNode jsonNode, Class<T> tClass) {
         return new NCResponseWrapper(jsonNode).wrap(tClass);
     }
+
+    private boolean isNC63(String groupId) {
+        return ncProperties.getGroupid().equals(groupId);
+    }
+
 
 }

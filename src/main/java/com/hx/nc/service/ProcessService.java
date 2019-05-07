@@ -104,6 +104,7 @@ public class ProcessService extends BaseService {
 
     public List<Attachment> queryInstAttachmentList(NCTaskBaseParams params) {
         return bpmDataConvertService.resolveAttachFromApproveDetail(
+                params.getGroupid(),
                 ncService.getNCApproveDetail(params.getUserid(), params.getGroupid(),
                         params.getTaskId(), null, null)
         );
