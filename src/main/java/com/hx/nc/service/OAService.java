@@ -139,10 +139,10 @@ public class OAService {
     }
 
     @Async
-    public void updateTask(String taskId, ACAEnums.action action) {
+    public void updateTask(String groupId, String taskId, ACAEnums.action action) {
         OARestResult result = null;
         try {
-            result = doOATaskUpdateRequest(taskId, action);
+            result = doOATaskUpdateRequest(groupId, taskId, action);
         } catch (Exception e) {
             log.error("updateOATask error>> " + e.getMessage());
             result = afterException(e);
@@ -152,21 +152,21 @@ public class OAService {
         }
     }
 
-    void updateTask(List<String> taskIds) {
+    void updateTask(final String groupId, List<String> taskIds) {
         Stream<CompletableFuture<Void>> completableFutureStream = taskIds.stream()
                 .map(x -> CompletableFuture.runAsync(() ->
-                                doOATaskUpdateRequest(x, ACAEnums.action.agree),
+                                doOATaskUpdateRequest(groupId, x, ACAEnums.action.agree),
                         applicationTaskExecutor));
         CompletableFuture.allOf(completableFutureStream.toArray(CompletableFuture[]::new))
                 .join();
     }
 
-    private OARestResult doOATaskUpdateRequest(String taskId, ACAEnums.action action) {
+    private OARestResult doOATaskUpdateRequest(String groupId, String taskId, ACAEnums.action action) {
         log.info(Thread.currentThread().getName() + "---updateTask--" + taskId
                 + "---" + action);
         return callOARest(buildOATaskUpdateRequestUrl(),
                 OATaskBaseParams.newBuilder()
-                        .setRegisterCode(properties.getRegisterCode())
+                        .setRegisterCode(properties.getNcRegisterCode(groupId))
                         .setTaskId(taskId)
                         .setState(action.taskNextState())
                         .setSubState(action.taskNextSubState())

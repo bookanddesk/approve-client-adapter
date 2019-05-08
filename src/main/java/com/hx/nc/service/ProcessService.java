@@ -65,7 +65,7 @@ public class ProcessService extends BaseService {
                 params.getCuserids());
 
         if (actionSuccess(result)) {
-            oaService.updateTask(params.getTaskId(), ACAEnums.action.valueOf(params.getAction()));
+            oaService.updateTask(params.getGroupid(), params.getTaskId(), ACAEnums.action.valueOf(params.getAction()));
         }
 
         return result;

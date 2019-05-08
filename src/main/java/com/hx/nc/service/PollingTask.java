@@ -90,7 +90,7 @@ public class PollingTask extends CacheKeyBuilder{
 
         int taskCount = ncTaskIds != null ? ncTaskIds.size() : 0;
         if (taskCount > 0) {
-            oaService.updateTask(ncTaskIds);
+            oaService.updateTask(groupId, ncTaskIds);
         }
     }
 

@@ -63,7 +63,7 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
         return resolveHistoricTasks(ncApproveDetailResponse, null);
     }
 
-    void packHistoricProcessInstanceResponseWithNCApproveDetail(
+    private void packHistoricProcessInstanceResponseWithNCApproveDetail(
             String jsonStr,
             HistoricProcessInstanceResponse historicProcessInstanceResponse) {
         NCApproveDetailResponse ncApproveDetailResponse = convertResponse(getNCDataNode(jsonStr), NCApproveDetailResponse.class);
@@ -125,7 +125,7 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
         return resolveAttachFormHistoryList(approveHistoryDataAdapter.getApprovehistorylinelist());
     }
 
-    public List<Attachment> resolveAttachFromApproveDetail(String groupId, String jsonStr) {
+    List<Attachment> resolveAttachFromApproveDetail(String groupId, String jsonStr) {
         if (isNC63(groupId))
             return resolveAttachFromApproveDetail(jsonStr);
 
@@ -421,11 +421,11 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
         return historicTaskInstanceResponses;
     }
 
-    private List<HistoricTaskInstanceResponse> resolveHistoricTasks(NC65ApproveDetailResponse approveDetailResponse,
-                                                                    HistoricProcessInstanceResponse historicProcessInstanceResponse) {
+    private void resolveHistoricTasks(NC65ApproveDetailResponse approveDetailResponse,
+                                      HistoricProcessInstanceResponse historicProcessInstanceResponse) {
         List<NCApproveHistoryData> approveHisList = approveDetailResponse.getApprovehistorylinelist();
         if (approveHisList == null || approveHisList.size() == 0) {
-            return null;
+            return;
         }
 
         List<HistoricTaskInstanceResponse> historicTaskInstanceResponses = approveHisList.stream()
@@ -458,7 +458,6 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
             }
         }
 
-        return historicTaskInstanceResponses;
     }
 
     private NCApproveHistoryDataAdapter getApproveHistoryDataAdapter(NCApproveDetailResponse approveDetailResponse) {
