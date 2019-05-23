@@ -69,6 +69,17 @@ public class ACAEnums {
                 return OATaskSubState.reject.code;
             }
         },
+        back("收回") {
+            @Override
+            public int taskNextState() {
+                return OATaskState.down.code;
+            }
+
+            @Override
+            public int taskNextSubState() {
+                return OATaskSubState.reject.code;
+            }
+        },
         disagree("不同意") {
             @Override
             public int taskNextState() {

@@ -57,7 +57,7 @@ public class OAService {
         this.repoService = repoService;
         this.applicationTaskExecutor = applicationTaskExecutor;
         this.token = CacheBuilder.newBuilder()
-                .expireAfterWrite(12, TimeUnit.MINUTES)
+                .expireAfterWrite(5, TimeUnit.MINUTES)
                 .maximumSize(1)
                 .build(new CacheLoader<String, String>() {
                     @Override
@@ -140,6 +140,8 @@ public class OAService {
 
     @Async
     public void updateTask(String groupId, String taskId, ACAEnums.action action) {
+        if(ACAEnums.action.back == action)
+            return;
         OARestResult result = null;
         try {
             result = doOATaskUpdateRequest(groupId, taskId, action);
@@ -179,7 +181,7 @@ public class OAService {
                         HttpMethod.POST,
                         buildHttpEntity(OAUserReqParams.builder().userzj(ncUserIds).build()),
                         JsonNode.class));
-        if (result != null && result.size() > 0) {
+        if (result != null && result.size() > 0 && result.get(0) != null) {
             return resolveOAUser(result.get(0));
         }
         return null;

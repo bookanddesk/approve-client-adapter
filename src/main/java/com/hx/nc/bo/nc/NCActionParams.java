@@ -13,7 +13,7 @@ import javax.validation.constraints.Pattern;
 @Data
 public class NCActionParams extends NCTaskBaseParams {
     @NotNull(message = "action参数不能为空！")
-    @Pattern(regexp = "agree|reject|disagree", message = "action参数不合法！")
+    @Pattern(regexp = "agree|reject|disagree|back", message = "action参数不合法！")
     private String action;
     private String approveMessage;
     private String billId;
