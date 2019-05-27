@@ -72,7 +72,7 @@ public class OAService {
         try {
             oaUser = getOAUser(list);
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error("get oa userInfo error: " + e.getMessage());
         }
         List<OATask> oaTasks;
         if (CollectionUtils.isEmpty(oaUser)) {
