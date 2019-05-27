@@ -99,10 +99,10 @@ hx.nc:
     oa-pwd: a1234567
     file-path: /usr/local/project/lpd.json
     nc65ph-Group-Id: 0001A1100000000029SK
-    nc65ph-IP: http://172.20.102.54:9998
+    nc65ph-IP: http://172.20.102.53:8082
     nc65ph-Register-Code: 3013
     nc65ds-Group-Id: 0001T1100000000003JS
-    nc65ds-IP: http://172.20.8.39
+    nc65ds-IP: http://172.20.10.241
     nc65ds-Register-Code: 3014
 
 logging:
