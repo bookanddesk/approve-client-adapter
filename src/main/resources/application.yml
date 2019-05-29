@@ -37,8 +37,8 @@ info.contact.email: xingjiajun88@sina.com
 
 #app
 hx.nc:
-#  IP: http://172.17.10.64:8081
-  IP: http://114.113.234.244:8091
+  IP: http://172.17.10.64:8081
+#  IP: http://172.17.10.65:8081
   host: http://114.113.234.244:8095
   userid: zxyadmin
   groupid: 0001V610000000000EEN
@@ -101,7 +101,7 @@ hx.nc:
     nc65ph-Group-Id: 0001A1100000000029SK
     nc65ph-IP: http://172.20.102.53:8082
     nc65ph-Register-Code: 3013
-    nc65ds-Group-Id: 0001T1100000000003JS
+    nc65ds-Group-Id: 0001A110000000000BLA
     nc65ds-IP: http://172.20.10.241
     nc65ds-Register-Code: 3014
 
