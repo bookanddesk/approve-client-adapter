@@ -190,17 +190,19 @@ public class OAService {
     private Map<String, OAUser> resolveOAUser(JsonNode jsonNode) {
         Map<String, OAUser> userMap = new HashMap<>(jsonNode.size(), 1);
         Iterator<Map.Entry<String, JsonNode>> fields = jsonNode.fields();
-        while (fields.hasNext()) {
-            Map.Entry<String, JsonNode> next = fields.next();
-            String ncId = next.getKey();
-            JsonNode oaValue = next.getValue();
-            userMap.put(ncId,
-                    OAUser.builder()
-                            .ncId(ncId)
-                            .name(JsonResultService.getValue(oaValue, "name"))
-                            .code(JsonResultService.getValue(oaValue, "code"))
-                            .build());
-        }
+        fields.forEachRemaining(x -> {
+            JsonNode value = x.getValue();
+            String code = JsonResultService.getValue(value, "code");
+            if (StringUtils.isNotEmpty(code)) {
+                String ncId = x.getKey();
+                userMap.put(ncId,
+                        OAUser.builder()
+                                .ncId(ncId)
+                                .name(JsonResultService.getValue(value, "name"))
+                                .code(JsonResultService.getValue(value, "code"))
+                                .build());
+            }
+        });
         return userMap;
     }
 
@@ -283,5 +285,6 @@ public class OAService {
                                 .build())
                 .build();
     }
+
 
 }
