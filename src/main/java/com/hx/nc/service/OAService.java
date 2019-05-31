@@ -181,8 +181,8 @@ public class OAService {
                         HttpMethod.POST,
                         buildHttpEntity(OAUserReqParams.builder().userzj(ncUserIds).build()),
                         JsonNode.class));
-        if (result != null && result.size() > 0 && result.get(0) != null) {
-            return resolveOAUser(result.get(0));
+        if (result != null && result.size() > 0) {
+            return resolveOAUser(result);
         }
         return null;
     }
