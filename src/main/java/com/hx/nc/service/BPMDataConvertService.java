@@ -19,6 +19,7 @@ import yonyou.bpm.rest.response.historic.HistoricActivityInstanceResponse;
 import yonyou.bpm.rest.response.historic.HistoricProcessInstanceResponse;
 import yonyou.bpm.rest.response.historic.HistoricTaskInstanceResponse;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -425,6 +426,8 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
                                       HistoricProcessInstanceResponse historicProcessInstanceResponse) {
         List<NCApproveHistoryData> approveHisList = approveDetailResponse.getApprovehistorylinelist();
         if (approveHisList == null || approveHisList.size() == 0) {
+            historicProcessInstanceResponse.setEndTime(Date.from(Instant.EPOCH));
+            historicProcessInstanceResponse.setDeleteReason("deleted");
             return;
         }
 
