@@ -64,10 +64,10 @@ public class ProcessService extends BaseService {
                 Optional.ofNullable(params.getApproveMessage()).orElse(params.getAction()),
                 params.getCuserids());
 
-        if (actionSuccess(result)) {
-            oaService.updateTask(params.getGroupid(), params.getTaskId(), ACAEnums.action.valueOf(params.getAction()));
-        }
+        if (!actionSuccess(result))
+            throw new RuntimeException("NC审批操作失败！");
 
+        oaService.updateTask(params.getGroupid(), params.getTaskId(), ACAEnums.action.valueOf(params.getAction()));
         return result;
     }
 
