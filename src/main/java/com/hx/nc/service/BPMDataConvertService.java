@@ -8,7 +8,9 @@ import com.hx.nc.data.convert.DateSwap;
 import com.hx.nc.data.convert.FileDataConvector;
 import com.hx.nc.data.wrap.*;
 import com.hx.nc.data.wrap.response.*;
+import com.hx.nc.utils.DateTimeUtils;
 import com.hx.nc.utils.StringUtils;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import yonyou.bpm.rest.ex.util.DateUtil;
@@ -19,7 +21,10 @@ import yonyou.bpm.rest.response.historic.HistoricActivityInstanceResponse;
 import yonyou.bpm.rest.response.historic.HistoricProcessInstanceResponse;
 import yonyou.bpm.rest.response.historic.HistoricTaskInstanceResponse;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -61,24 +66,25 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
         if (ncApproveDetailResponse == null) {
             return null;
         }
-        return resolveHistoricTasks(ncApproveDetailResponse, null);
+        return resolveHistoricTasks(null, ncApproveDetailResponse, null);
     }
 
     private void packHistoricProcessInstanceResponseWithNCApproveDetail(
+            String taskId,
             String jsonStr,
             HistoricProcessInstanceResponse historicProcessInstanceResponse) {
         NCApproveDetailResponse ncApproveDetailResponse = convertResponse(getNCDataNode(jsonStr), NCApproveDetailResponse.class);
         if (ncApproveDetailResponse == null) {
             return;
         }
-        resolveHistoricTasks(ncApproveDetailResponse, historicProcessInstanceResponse);
+        resolveHistoricTasks(taskId, ncApproveDetailResponse, historicProcessInstanceResponse);
     }
 
     void packHistoricProcessInstanceResponseWithNCApproveDetail(
-            String groupId, String jsonStr,
+            String taskId, String groupId, String jsonStr,
             HistoricProcessInstanceResponse historicProcessInstanceResponse) {
         if (isNC63(groupId)) {
-            packHistoricProcessInstanceResponseWithNCApproveDetail(jsonStr, historicProcessInstanceResponse);
+            packHistoricProcessInstanceResponseWithNCApproveDetail(taskId, jsonStr, historicProcessInstanceResponse);
             return;
         }
 
@@ -86,7 +92,7 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
         if (nc65ApproveDetailResponse == null) {
             return;
         }
-        resolveHistoricTasks(nc65ApproveDetailResponse, historicProcessInstanceResponse);
+        resolveHistoricTasks(taskId, nc65ApproveDetailResponse, historicProcessInstanceResponse);
     }
 
     @Override
@@ -387,77 +393,112 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
         formDataMap.put(id.toUpperCase(), billItem.getShowValue());
     }
 
-    private List<HistoricTaskInstanceResponse> resolveHistoricTasks(NCApproveDetailResponse approveDetailResponse,
+    private List<HistoricTaskInstanceResponse> resolveHistoricTasks(String taskId,
+                                                                    NCApproveDetailResponse approveDetailResponse,
                                                                     HistoricProcessInstanceResponse historicProcessInstanceResponse) {
+        if (historicProcessInstanceResponse == null)
+            return Collections.emptyList();
+
         NCApproveHistoryDataAdapter ncApproveHistoryDataAdapter = getApproveHistoryDataAdapter(approveDetailResponse);
         if (ncApproveHistoryDataAdapter == null) {
-            return null;
+            return Collections.emptyList();
         }
+
         List<NCApproveHistoryData> approveHisList = ncApproveHistoryDataAdapter.getApprovehistorylinelist();
         if (approveHisList == null || approveHisList.size() == 0) {
-            return null;
+            historicProcessInstanceResponse.setEndTime(deletedDate());
+            historicProcessInstanceResponse.setDeleteReason("deleted");
+            return Collections.emptyList();
         }
 
-        List<HistoricTaskInstanceResponse> historicTaskInstanceResponses = approveHisList.stream()
-                .map(this::buildHistoricTask)
-                .collect(Collectors.toList());
+//        List<HistoricTaskInstanceResponse> historicTaskInstanceResponses = approveHisList.stream()
+//                .map(this::buildHistoricTask)
+//                .collect(Collectors.toList());
 
-        if (historicProcessInstanceResponse != null) {
-            historicProcessInstanceResponse.setHistoricTasks(historicTaskInstanceResponses);
-            historicProcessInstanceResponse.setHistoricActivityInstances(
-                    resolveHistoricActivities(
-                            approveDetailResponse.getMakername(), approveDetailResponse.getSubmitdate()));
-            List<NCFlowHistoryData> flowHistoryDataList = ncApproveHistoryDataAdapter.getFlowhistory();
-            if (flowHistoryDataList != null && flowHistoryDataList.size() > 0) {
-                flowHistoryDataList.stream()
-                        .filter(x -> "final".equalsIgnoreCase(x.getUnittype()))
-                        .findAny()
-                        .ifPresent(x -> {
-                            historicProcessInstanceResponse.setDeleteReason("end");
-                            historicProcessInstanceResponse.setEndTime(x.getTime());
-                        });
+        List<HistoricTaskInstanceResponse> historicTaskInstanceResponses = new ArrayList<>(approveHisList.size());
+        boolean hideButton = false;
+        for (NCApproveHistoryData ncApproveHistoryData : approveHisList) {
+            //隐藏按钮
+            if (!hideButton &&
+                    taskId.equals(ncApproveHistoryData.getApprovedid()) &&
+                    StringUtils.equalsAny(String.valueOf(ncApproveHistoryData.getApprovestatus()), "4", "null")) {
+                hideButton = true;
+                historicProcessInstanceResponse.setEndTime(hiddenDate());
             }
+
+            historicTaskInstanceResponses.add(buildHistoricTask(ncApproveHistoryData));
+        }
+
+        historicProcessInstanceResponse.setHistoricTasks(historicTaskInstanceResponses);
+        historicProcessInstanceResponse.setHistoricActivityInstances(
+                resolveHistoricActivities(
+                        approveDetailResponse.getMakername(), approveDetailResponse.getSubmitdate()));
+        List<NCFlowHistoryData> flowHistoryDataList = ncApproveHistoryDataAdapter.getFlowhistory();
+        if (flowHistoryDataList != null && flowHistoryDataList.size() > 0) {
+            flowHistoryDataList.stream()
+                    .filter(x -> "final".equalsIgnoreCase(x.getUnittype()))
+                    .findAny()
+                    .ifPresent(x -> {
+                        historicProcessInstanceResponse.setDeleteReason("end");
+                        historicProcessInstanceResponse.setEndTime(x.getTime());
+                    });
         }
 
         return historicTaskInstanceResponses;
     }
 
-    private void resolveHistoricTasks(NC65ApproveDetailResponse approveDetailResponse,
+    private void resolveHistoricTasks(String taskId,
+                                      NC65ApproveDetailResponse approveDetailResponse,
                                       HistoricProcessInstanceResponse historicProcessInstanceResponse) {
+        if (historicProcessInstanceResponse == null)
+            return;
+
         List<NCApproveHistoryData> approveHisList = approveDetailResponse.getApprovehistorylinelist();
+
+        //收回的任务审批历史为空，不显示按钮，状态显示已收回
         if (approveHisList == null || approveHisList.size() == 0) {
-            historicProcessInstanceResponse.setEndTime(Date.from(Instant.EPOCH));
+            historicProcessInstanceResponse.setEndTime(deletedDate());
             historicProcessInstanceResponse.setDeleteReason("deleted");
             return;
         }
 
-        List<HistoricTaskInstanceResponse> historicTaskInstanceResponses = approveHisList.stream()
-                .map(this::buildHistoricTask)
-                .collect(Collectors.toList());
+        List<HistoricTaskInstanceResponse> historicTaskInstanceResponses = new ArrayList<>(approveHisList.size());
+//                approveHisList.stream()
+//                .map(this::buildHistoricTask)
+//                .collect(Collectors.toList());
+        boolean hideButton = false;
+        for (NCApproveHistoryData ncApproveHistoryData : approveHisList) {
+            historicTaskInstanceResponses.add(buildHistoricTask(ncApproveHistoryData));
+            //根据当前任务approvestatus隐藏按钮
+            if (!hideButton &&
+                    taskId.equals(ncApproveHistoryData.getApprovedid()) &&
+                    StringUtils.equalsAny(String.valueOf(ncApproveHistoryData.getApprovestatus()), "4", "null")) {
+                hideButton = true;
+                historicProcessInstanceResponse.setEndTime(hiddenDate());
+            }
+        }
 
-        if (historicProcessInstanceResponse != null) {
-            historicProcessInstanceResponse.setHistoricTasks(historicTaskInstanceResponses);
-            List<NCFlowHistoryData> flowHistoryDataList = approveDetailResponse.getFlowhistory();
-            if (flowHistoryDataList != null && flowHistoryDataList.size() > 0) {
-                flowHistoryDataList.stream()
-                        .filter(x -> "final".equalsIgnoreCase(x.getUnittype()))
-                        .findAny()
-                        .ifPresent(x -> {
-                            historicProcessInstanceResponse.setDeleteReason("end");
-                            historicProcessInstanceResponse.setEndTime(x.getTime());
-                        });
-                Map<String, List<NCFlowHistoryData>> collect = flowHistoryDataList.stream()
-                        .collect(Collectors.groupingBy(NCFlowHistoryData::getUnittype));
-                if (collect.containsKey("final")) {
-                    historicProcessInstanceResponse.setDeleteReason("end");
-                    historicProcessInstanceResponse.setEndTime(collect.get("final").get(0).getTime());
-                }
-                if (collect.containsKey("submit")) {
-                    NCFlowHistoryData submit = collect.get("submit").get(0);
-                    historicProcessInstanceResponse.setHistoricActivityInstances(
-                            resolveHistoricActivities(
-                                    submit.getPersonlist().get(0).getName(), submit.getTime()));
-                }
+        historicProcessInstanceResponse.setHistoricTasks(historicTaskInstanceResponses);
+        List<NCFlowHistoryData> flowHistoryDataList = approveDetailResponse.getFlowhistory();
+        if (flowHistoryDataList != null && flowHistoryDataList.size() > 0) {
+            flowHistoryDataList.stream()
+                    .filter(x -> "final".equalsIgnoreCase(x.getUnittype()))
+                    .findAny()
+                    .ifPresent(x -> {
+                        historicProcessInstanceResponse.setDeleteReason("end");
+                        historicProcessInstanceResponse.setEndTime(x.getTime());
+                    });
+            Map<String, List<NCFlowHistoryData>> collect = flowHistoryDataList.stream()
+                    .collect(Collectors.groupingBy(NCFlowHistoryData::getUnittype));
+            if (collect.containsKey("final")) {
+                historicProcessInstanceResponse.setDeleteReason("end");
+                historicProcessInstanceResponse.setEndTime(collect.get("final").get(0).getTime());
+            }
+            if (collect.containsKey("submit")) {
+                NCFlowHistoryData submit = collect.get("submit").get(0);
+                historicProcessInstanceResponse.setHistoricActivityInstances(
+                        resolveHistoricActivities(
+                                submit.getPersonlist().get(0).getName(), submit.getTime()));
             }
         }
 
@@ -522,5 +563,14 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
         return ncProperties.getGroupid().equals(groupId);
     }
 
+    //标志按钮隐藏的时间 1980-01-01 08:00:00
+    private Date hiddenDate() {
+        return DateUtils.addYears(deletedDate(), 10);
+    }
+
+    //标志任务收回删除态的时间 1970-01-01 08:00:00
+    private Date deletedDate() {
+        return Date.from(Instant.EPOCH);
+    }
 
 }

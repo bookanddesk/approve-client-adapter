@@ -15,6 +15,7 @@ import java.util.List;
 public class NCApproveHistoryData extends PojoMapSupport{
     private String note;
     private String approvedid;
+    private Integer approvestatus;//4或者空时隐藏按钮 20190616
     private String psnid;
     private String count;
     private Date handledate;
