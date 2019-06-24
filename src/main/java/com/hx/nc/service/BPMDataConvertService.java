@@ -416,18 +416,20 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
 //                .collect(Collectors.toList());
 
         List<HistoricTaskInstanceResponse> historicTaskInstanceResponses = new ArrayList<>(approveHisList.size());
-        boolean hideButton = false;
+//        boolean hideButton = true;
         for (NCApproveHistoryData ncApproveHistoryData : approveHisList) {
             //隐藏按钮
-            if (!hideButton &&
-                    taskId.equals(ncApproveHistoryData.getApprovedid()) &&
-                    StringUtils.equalsAny(String.valueOf(ncApproveHistoryData.getApprovestatus()), "4", "null")) {
-                hideButton = true;
-                historicProcessInstanceResponse.setEndTime(hiddenDate());
-            }
+            //63补丁未打 20190624
+//            if (hideButton && taskId.equals(ncApproveHistoryData.getApprovedid())
+//                    && 4 != Optional.ofNullable(ncApproveHistoryData.getApprovestatus()).orElse(0)) {
+//                hideButton = false;
+//            }
 
             historicTaskInstanceResponses.add(buildHistoricTask(ncApproveHistoryData));
         }
+
+//        if (hideButton)
+//            historicProcessInstanceResponse.setEndTime(hiddenDate());
 
         historicProcessInstanceResponse.setHistoricTasks(historicTaskInstanceResponses);
         historicProcessInstanceResponse.setHistoricActivityInstances(
@@ -466,17 +468,19 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
 //                approveHisList.stream()
 //                .map(this::buildHistoricTask)
 //                .collect(Collectors.toList());
-        boolean hideButton = false;
+        boolean hideButton = true;
         for (NCApproveHistoryData ncApproveHistoryData : approveHisList) {
             historicTaskInstanceResponses.add(buildHistoricTask(ncApproveHistoryData));
             //根据当前任务approvestatus隐藏按钮
-            if (!hideButton &&
-                    taskId.equals(ncApproveHistoryData.getApprovedid()) &&
-                    StringUtils.equalsAny(String.valueOf(ncApproveHistoryData.getApprovestatus()), "4", "null")) {
-                hideButton = true;
-                historicProcessInstanceResponse.setEndTime(hiddenDate());
+            if (hideButton && taskId.equals(ncApproveHistoryData.getApprovedid())
+                    && 4 != Optional.ofNullable(ncApproveHistoryData.getApprovestatus()).orElse(0)) {
+                hideButton = false;
             }
         }
+
+        if (hideButton)
+            historicProcessInstanceResponse.setEndTime(hiddenDate());
+
 
         historicProcessInstanceResponse.setHistoricTasks(historicTaskInstanceResponses);
         List<NCFlowHistoryData> flowHistoryDataList = approveDetailResponse.getFlowhistory();
