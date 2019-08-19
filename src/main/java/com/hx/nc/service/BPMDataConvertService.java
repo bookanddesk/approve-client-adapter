@@ -481,7 +481,6 @@ public class BPMDataConvertService extends AbstractNCDataProcessService implemen
         if (hideButton)
             historicProcessInstanceResponse.setEndTime(hiddenDate());
 
-
         historicProcessInstanceResponse.setHistoricTasks(historicTaskInstanceResponses);
         List<NCFlowHistoryData> flowHistoryDataList = approveDetailResponse.getFlowhistory();
         if (flowHistoryDataList != null && flowHistoryDataList.size() > 0) {

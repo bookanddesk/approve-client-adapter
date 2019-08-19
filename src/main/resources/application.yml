@@ -21,9 +21,12 @@ spring:
       settings.web-allow-others: true
   jpa.hibernate.ddl-auto: update
   http.encoding.force: true
-  task.execution.pool:
-    max-size: 16
-    queue-capacity: 100
+  task:
+    execution.pool:
+      max-size: 16
+      queue-capacity: 100
+    scheduling.pool.size: 6
+
 
 #  data.jpa.repositories.bootstrap-mode: lazy
 
