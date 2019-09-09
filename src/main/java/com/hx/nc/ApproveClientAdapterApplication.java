@@ -18,7 +18,7 @@ import javax.sql.DataSource;
 
 @SpringBootApplication
 @EnableScheduling
-@EnableAsync
+//@EnableAsync
 public class ApproveClientAdapterApplication {
 
     public static void main(String[] args) {
