@@ -11,7 +11,7 @@
     <groupId>com.hx.nc</groupId>
     <artifactId>approve-client-adapter</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
+    <packaging>war</packaging>
     <name>approve-client-adapter</name>
     <description>hxnc approve mClient project</description>
 
