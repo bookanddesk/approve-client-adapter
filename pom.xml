@@ -11,7 +11,7 @@
     <groupId>com.hx.nc</groupId>
     <artifactId>approve-client-adapter</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <packaging>war</packaging>
+    <packaging>jar</packaging>
     <name>approve-client-adapter</name>
     <description>hxnc approve mClient project</description>
 
@@ -100,8 +100,14 @@
             <groupId>com.yonyou.uap.bpm</groupId>
             <artifactId>ubpm-rest-sdk</artifactId>
             <version>1.2.2-SNAPSHOT</version>
-            <!--<scope>system</scope>
-            <systemPath>${basedir}/lib/sdk.jar</systemPath>-->
+            <scope>system</scope>
+            <systemPath>${project.basedir}/lib/ubpm-rest-sdk-1.2.2-SNAPSHOT.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-codec</groupId>
+            <artifactId>commons-codec</artifactId>
+            <version>1.11</version>
         </dependency>
 
     </dependencies>
