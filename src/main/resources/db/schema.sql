@@ -1,0 +1,9 @@
+-- create table if not exists oa_rest_record (
+--   id identity,
+--   rest_at timestamp not null,
+--   url varchar(20) not null,
+--   params varchar(200) not null,
+--   result varchar(20) not null,
+--   success int(1) not null,
+--   type varchar(10) not null
+-- ) ;
