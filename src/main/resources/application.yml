@@ -89,7 +89,9 @@ logging:
 spring.profiles: prod
 
 spring:
-  datasource.url: jdbc:h2:/usr/local/project/h2/h2db
+  datasource:
+    url: jdbc:mysql://rm-2zely9zmlbl3rmcr7zo.mysql.rds.aliyuncs.com/hxaca
+    driver-class-name: com.mysql.jdbc.Driver
 
 hx.nc:
     IP: http://172.17.10.65:8081
