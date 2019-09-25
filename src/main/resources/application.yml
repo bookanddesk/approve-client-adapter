@@ -95,7 +95,8 @@ spring:
 
 hx.nc:
     IP: http://172.17.10.65:8081
-    host: http://114.113.234.242:9095
+#    host: http://114.113.234.242:9095
+    host: http://101.254.191.78:8090
     userid: zxyadmin
     groupid: 0001V610000000000EEN
     oa-IP: http://oa.hxgp.com
