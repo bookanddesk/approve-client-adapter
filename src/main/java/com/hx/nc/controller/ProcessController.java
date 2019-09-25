@@ -113,6 +113,12 @@ public class ProcessController extends BaseController {
         return JsonResult.successResult();
     }
 
+    /**
+     * 附件下载
+     * @param params
+     * @param bindingResult
+     * @return
+     */
     @GetMapping("/download")
     public ResponseEntity<byte[]> download(@Valid NCFileDataParams params, BindingResult bindingResult) {
         handleValidateError(bindingResult);

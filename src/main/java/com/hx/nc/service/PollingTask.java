@@ -41,6 +41,9 @@ public class PollingTask extends CacheKeyBuilder{
     }
 
 
+    /**
+     * nc代办轮询
+     */
     @Scheduled(initialDelay = Constants.POLL_DELAY_ONE_MINUTES, fixedRate = Constants.LAST_POLL_DURATION_MILLIS)
     public void ncTaskPolling() {
         properties.getNc65Properties().keySet().forEach(
@@ -71,6 +74,9 @@ public class PollingTask extends CacheKeyBuilder{
         recordH2Polling(lastPollDate, taskCount, ncResult, groupId);
     }
 
+    /**
+     * nc已办轮询
+     */
     @Scheduled(initialDelay = Constants.POLL_DELAY_TWO_MINUTES, fixedRate = Constants.LAST_POLL_DURATION_MILLIS)
     public void ncDoneTaskPolling() {
         properties.getNc65Properties().keySet().forEach(
